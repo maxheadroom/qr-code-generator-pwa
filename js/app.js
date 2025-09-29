@@ -5,7 +5,7 @@ class QRGeneratorApp {
 		this.currentQRData = null;
 		this.generatedQR = null;
 		this.history = this.loadHistory();
-		
+
 		this.init();
 	}
 
@@ -69,20 +69,20 @@ class QRGeneratorApp {
 	showGeneratorForm() {
 		document.getElementById('qrGeneratorSection').style.display = 'block';
 		document.getElementById('qrCustomization').style.display = 'block';
-		
-		document.getElementById('qrGeneratorSection').scrollIntoView({ 
-			behavior: 'smooth' 
+
+		document.getElementById('qrGeneratorSection').scrollIntoView({
+			behavior: 'smooth'
 		});
 	}
 
 	hideGeneratorForm() {
 		document.getElementById('qrGeneratorSection').style.display = 'none';
 		document.getElementById('qrCustomization').style.display = 'none';
-		
+
 		document.querySelectorAll('.qr-type-card').forEach(card => {
 			card.classList.remove('selected');
 		});
-		
+
 		this.currentQRType = null;
 		this.currentQRData = null;
 		this.generatedQR = null;
@@ -94,7 +94,7 @@ class QRGeneratorApp {
 
 		const form = document.getElementById('qrForm');
 		const title = document.getElementById('formTitle');
-		
+
 		title.textContent = this.currentQRType.name;
 		form.innerHTML = '';
 
@@ -116,7 +116,7 @@ class QRGeneratorApp {
 		}
 
 		const input = this.createInput(field);
-		
+
 		group.appendChild(label);
 		group.appendChild(input);
 
@@ -164,43 +164,92 @@ class QRGeneratorApp {
 		const data = {};
 
 		for (let [key, value] of formData.entries()) {
-			data[key] = value;
+			data[key] = this.sanitizeInput(value);
 		}
 
 		return data;
 	}
 
+	// Sanitize user input
+	sanitizeInput(input) {
+		if (typeof input !== 'string') return input;
+
+		// Remove potentially dangerous characters
+		return input
+			.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+			.replace(/<[^>]*>/g, '')
+			.trim();
+	}
+
 	validateForm() {
-		console.log('validateForm called');
-		console.log('currentQRType:', this.currentQRType);
-		
-		if (!this.currentQRType) {
-			console.log('No currentQRType selected');
-			return false;
-		}
-
-		const formData = this.getFormData();
-		console.log('Form data in validation:', formData);
-
-		for (let field of this.currentQRType.fields) {
-			console.log('Checking field:', field.name, 'required:', field.required);
-			if (field.required && (!formData[field.name] || formData[field.name].trim() === '')) {
-				console.log('Field validation failed:', field.name);
-				this.showToast('error', `El campo "${field.label}" es requerido`);
+		try {
+			if (!this.currentQRType) {
+				this.showToast('error', 'Selecciona un tipo de QR primero');
 				return false;
 			}
-		}
 
-		console.log('Form validation passed');
+			const formData = this.getFormData();
+
+			for (let field of this.currentQRType.fields) {
+				const value = formData[field.name];
+
+				// Check required fields
+				if (field.required && (!value || value.trim() === '')) {
+					this.showToast('error', `El campo "${field.label}" es requerido`);
+					return false;
+				}
+
+				// Type-specific validation
+				if (value && !this.validateField(field, value)) {
+					return false;
+				}
+			}
+
+			return true;
+		} catch (error) {
+			this.showToast('error', 'Error en la validación del formulario');
+			return false;
+		}
+	}
+
+	// Validate individual field
+	validateField(field, value) {
+		switch (field.type) {
+			case 'email':
+				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if (!emailRegex.test(value)) {
+					this.showToast('error', `El campo "${field.label}" debe ser un email válido`);
+					return false;
+				}
+				break;
+			case 'url':
+				try {
+					new URL(value);
+				} catch {
+					this.showToast('error', `El campo "${field.label}" debe ser una URL válida`);
+					return false;
+				}
+				break;
+			case 'tel':
+				const phoneRegex = /^[\+]?[0-9\s\-\(\)]{7,}$/;
+				if (!phoneRegex.test(value)) {
+					this.showToast('error', `El campo "${field.label}" debe ser un número de teléfono válido`);
+					return false;
+				}
+				break;
+			case 'number':
+				if (isNaN(value) || value < (field.min || 0)) {
+					this.showToast('error', `El campo "${field.label}" debe ser un número válido`);
+					return false;
+				}
+				break;
+		}
 		return true;
 	}
 
 	// QR Generation
 	async generateQR() {
-		console.log('generateQR called');
-		
 		if (!this.validateForm()) {
-			console.log('Form validation failed');
 			return;
 		}
 
@@ -208,37 +257,29 @@ class QRGeneratorApp {
 		if (typeof QRCode === 'undefined') {
 			console.error('QRCode library not available');
 			this.showToast('error', 'Error: Librería QR no cargada. Intentando cargar...');
-			
+
 			// Intentar cargar la librería dinámicamente
 			await this.loadQRCodeLibrary();
-			
+
 			if (typeof QRCode === 'undefined') {
 				this.showToast('error', 'Error: No se pudo cargar la librería QR. Verifica tu conexión a internet.');
 				return;
 			}
 		}
 
-		console.log('QRCode library is available');
-
 		this.showLoading(true);
 
 		try {
 			const formData = this.getFormData();
-			console.log('Form data:', formData);
-			
 			const qrData = this.currentQRType.generate(formData);
-			console.log('Generated QR data:', qrData);
-			
+
 			if (!qrData || qrData.trim() === '') {
 				throw new Error('No se pudo generar los datos del QR');
 			}
-			
+
 			const options = this.getQROptions();
-			console.log('QR options:', options);
-			
 			const qrImage = await this.createQRCode(qrData, options);
-			console.log('QR image generated successfully');
-			
+
 			this.generatedQR = {
 				type: this.currentQRType.name,
 				data: qrData,
@@ -265,7 +306,7 @@ class QRGeneratorApp {
 		const qrForeground = document.getElementById('qrForeground');
 		const qrBackground = document.getElementById('qrBackground');
 		const qrMargin = document.getElementById('qrMargin');
-		
+
 		const options = {
 			size: qrSize ? parseInt(qrSize.value) : 256,
 			errorCorrectionLevel: qrErrorLevel ? qrErrorLevel.value : 'M',
@@ -273,8 +314,7 @@ class QRGeneratorApp {
 			background: qrBackground ? qrBackground.value : '#FFFFFF',
 			margin: qrMargin ? parseInt(qrMargin.value) : 4
 		};
-		
-		console.log('QR Options retrieved:', options);
+
 		return options;
 	}
 
@@ -288,13 +328,13 @@ class QRGeneratorApp {
 				}
 
 				// Validate data
-				if (!data || data.trim() === '') {
+				if (!data || data.trim === '') {
 					reject(new Error('No data provided for QR code'));
 					return;
 				}
 
-				console.log('Creating QR with options:', options);
-				console.log('QRCode library type:', typeof QRCode);
+				('Creating QR with options:', options);
+				('QRCode library type:', typeof QRCode);
 
 				// Get all customization options with defaults
 				const qrOptions = {
@@ -307,7 +347,7 @@ class QRGeneratorApp {
 					margin: options.margin || 4
 				};
 
-				console.log('QR Options being applied:', qrOptions);
+				('QR Options being applied:', qrOptions);
 
 				// Add logo if available
 				const logoImage = document.getElementById('logoImage');
@@ -315,7 +355,7 @@ class QRGeneratorApp {
 					qrOptions.logo = logoImage.src;
 					qrOptions.logoWidth = Math.floor(qrOptions.width * 0.2);
 					qrOptions.logoHeight = Math.floor(qrOptions.width * 0.2);
-					console.log('Logo applied:', logoImage.src);
+					('Logo applied:', logoImage.src);
 				}
 
 				// Add gradient if enabled
@@ -327,10 +367,10 @@ class QRGeneratorApp {
 						dark: gradientStart,
 						light: options.background || '#FFFFFF'
 					};
-					console.log('Gradient applied:', gradientStart, 'to', gradientEnd);
+					('Gradient applied:', gradientStart, 'to', gradientEnd);
 				}
 
-				console.log('Final QR options:', qrOptions);
+				('Final QR options:', qrOptions);
 
 				// Try to generate QR with callback style first
 				if (typeof QRCode.toDataURL === 'function') {
@@ -339,7 +379,7 @@ class QRGeneratorApp {
 							console.error('QRCode generation error:', err);
 							reject(err);
 						} else {
-							console.log('QR generated successfully with callback');
+							('QR generated successfully with callback');
 							resolve(url);
 						}
 					});
@@ -347,7 +387,7 @@ class QRGeneratorApp {
 					// Fallback for non-callback style
 					try {
 						const url = QRCode.toDataURL(data, qrOptions);
-						console.log('QR generated successfully without callback');
+						('QR generated successfully without callback');
 						resolve(url);
 					} catch (error) {
 						console.error('QRCode generation error (non-callback):', error);
@@ -381,13 +421,36 @@ class QRGeneratorApp {
 	}
 
 	// Download QR
-	downloadQR() {
+	async downloadQR() {
 		if (!this.generatedQR) return;
 
-		const link = document.createElement('a');
-		link.download = `qr-${this.currentQRType.id}-${Date.now()}.png`;
-		link.href = this.generatedQR.image;
-		link.click();
+		// Load FileSaver if not available
+		if (typeof saveAs === 'undefined') {
+			await this.loadFileSaver();
+		}
+
+		// Convert data URL to blob and save
+		const response = await fetch(this.generatedQR.image);
+		const blob = await response.blob();
+		saveAs(blob, `qr-${this.currentQRType.id}-${Date.now()}.png`);
+	}
+
+	// Load FileSaver dynamically
+	async loadFileSaver() {
+		return new Promise((resolve) => {
+			if (typeof saveAs !== 'undefined') {
+				resolve();
+				return;
+			}
+
+			const script = document.createElement('script');
+			script.src = 'https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js';
+			script.integrity = 'sha512-QLvvrxgJTYBqhfghX6F5stSF+Y9K/6qF+6W6GZ+1OJ7j8W5oVMG5eGzZ+JJBJXJ1ETv3q6jE6v8U6o5V+MzBqDg==';
+			script.crossOrigin = 'anonymous';
+			script.onload = () => resolve();
+			script.onerror = () => resolve(); // Continue without FileSaver
+			document.head.appendChild(script);
+		});
 	}
 
 	// Share QR
@@ -434,7 +497,7 @@ class QRGeneratorApp {
 		};
 
 		this.history.unshift(historyItem);
-		
+
 		if (this.history.length > 20) {
 			this.history = this.history.slice(0, 20);
 		}
@@ -469,7 +532,7 @@ class QRGeneratorApp {
 	toggleTheme() {
 		const currentTheme = document.documentElement.getAttribute('data-theme');
 		const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-		
+
 		document.documentElement.setAttribute('data-theme', newTheme);
 		localStorage.setItem('theme', newTheme);
 	}
@@ -558,13 +621,13 @@ class QRGeneratorApp {
 
 		// Customization tabs
 		this.setupCustomizationTabs();
-		
+
 		// Color picker sync
 		this.setupColorPickers();
-		
+
 		// Logo upload
 		this.setupLogoUpload();
-		
+
 		// Customization actions
 		document.getElementById('resetCustomization')?.addEventListener('click', () => {
 			this.resetCustomization();
@@ -576,7 +639,7 @@ class QRGeneratorApp {
 
 		// Donation buttons
 		this.setupDonationButtons();
-		
+
 		// Set current year
 		this.setCurrentYear();
 	}
@@ -589,11 +652,11 @@ class QRGeneratorApp {
 		tabBtns.forEach(btn => {
 			btn.addEventListener('click', () => {
 				const tabName = btn.dataset.tab;
-				
+
 				// Remove active class from all tabs
 				tabBtns.forEach(b => b.classList.remove('active'));
 				tabContents.forEach(c => c.classList.remove('active'));
-				
+
 				// Add active class to clicked tab
 				btn.classList.add('active');
 				document.getElementById(`${tabName}-tab`).classList.add('active');
@@ -731,7 +794,7 @@ class QRGeneratorApp {
 	// Setup donation buttons
 	setupDonationButtons() {
 		const donationBtns = document.querySelectorAll('.donation-btn');
-		
+
 		donationBtns.forEach(btn => {
 			btn.addEventListener('click', () => {
 				const crypto = btn.dataset.crypto;
@@ -742,15 +805,17 @@ class QRGeneratorApp {
 
 	// Show donation info
 	showDonationInfo(crypto) {
-		const addresses = {
-			bitcoin: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
-			monero: '4A1Vp94pK9qE2qMqLQmVL7Q6Y7J8K9L0M1N2O3P4Q5R6S7T8U9V0W1X2Y3Z4',
-			ethereum: '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+		const walletAddress = '0x383989EcF887978af4B07749346b2343F3fB9D66';
+
+		const cryptoNames = {
+			bitcoin: 'Bitcoin',
+			monero: 'Monero',
+			ethereum: 'Ethereum'
 		};
 
-		const address = addresses[crypto];
-		if (address) {
-			const message = `Dirección ${crypto.charAt(0).toUpperCase() + crypto.slice(1)}: ${address}`;
+		const cryptoName = cryptoNames[crypto];
+		if (cryptoName) {
+			const message = `Dirección ${cryptoName} (ETH): ${walletAddress}`;
 			this.showToast('info', message);
 		} else {
 			this.showToast('error', 'Criptomoneda no soportada');
@@ -760,14 +825,19 @@ class QRGeneratorApp {
 	// Load QRCode library dynamically
 	async loadQRCodeLibrary() {
 		return new Promise((resolve) => {
+			// Check if already loaded
+			if (typeof QRCode !== 'undefined') {
+				resolve();
+				return;
+			}
+
 			const script = document.createElement('script');
-			script.src = 'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js';
+			script.src = 'js/libs/qrcode.min.js';
 			script.onload = () => {
-				console.log('QRCode library loaded dynamically');
 				resolve();
 			};
 			script.onerror = () => {
-				console.log('QRCode library failed to load dynamically, using fallback');
+				console.error('QRCode library failed to load from local assets');
 				resolve();
 			};
 			document.head.appendChild(script);

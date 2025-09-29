@@ -1,5 +1,14 @@
-<<<<<<< HEAD
-# qr-code-generator-pwa
+# QR Generator Offline
+
+Generador de códigos QR offline que funciona como Progressive Web App (PWA). Crea QR para URLs, contactos, WiFi, pagos y más sin necesidad de conexión a internet.
+
+## ✅ Mejoras Recientes (v1.0.1)
+
+- 🔒 **Seguridad mejorada**: SRI en scripts externos, sanitización de inputs
+- ⚡ **Rendimiento optimizado**: CSS/JS minificado, lazy loading
+- 🎨 **UX mejorada**: Validación de formularios, tooltips, accesibilidad
+- 🛠️ **Calidad de código**: ESLint configurado, estructura modular
+- 📱 **PWA mejorado**: Cache versioning, iconos optimizados
 =======
 # QR Generator Offline
 

@@ -1,0 +1,19 @@
+{
+  "name": "qr-generator-offline-pwa",
+  "version": "1.0.1",
+  "description": "Generador de códigos QR offline - Crea QR para URLs, contactos, WiFi y más",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "build": "echo 'Build process would minify assets here'",
+    "lint": "eslint js/*.js",
+    "test": "echo 'No tests yet'"
+  },
+  "keywords": ["qr", "pwa", "offline", "generator"],
+  "author": "QR Generator Team",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "serve": "^14.0.0"
+  }
+}

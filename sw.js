@@ -1,7 +1,8 @@
 // Service Worker for QR Generator PWA
-const CACHE_NAME = 'qr-generator-v1.0.0';
-const STATIC_CACHE = 'qr-generator-static-v1.0.0';
-const DYNAMIC_CACHE = 'qr-generator-dynamic-v1.0.0';
+const VERSION = '1.0.1';
+const CACHE_NAME = `qr-generator-v${VERSION}`;
+const STATIC_CACHE = `qr-generator-static-v${VERSION}`;
+const DYNAMIC_CACHE = `qr-generator-dynamic-v${VERSION}`;
 
 // Files to cache
 const STATIC_FILES = [
@@ -11,9 +12,9 @@ const STATIC_FILES = [
 	'/js/app.js',
 	'/js/qr-types.js',
 	'/js/pwa.js',
-	'/manifest.json',
-	'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
-	'https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js'
+	'/js/libs/qrcode.min.js',
+	'/js/libs/qrcode-wrapper.js',
+	'/manifest.json'
 ];
 
 // Install event
