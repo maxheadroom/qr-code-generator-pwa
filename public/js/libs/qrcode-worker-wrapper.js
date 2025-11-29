@@ -46,8 +46,15 @@
     // Add static method for generating QR codes in a Web Worker
     QRCodeWorkerWrapper.generateQRData = function(text, options) {
         try {
-            var wrapper = new QRCodeWorkerWrapper(text, options);
-            return wrapper.toDataURL(options);
+            // Create QR code instance
+            var qrCode = new OriginalQRCode(null, options);
+            qrCode.makeCode(text);
+            
+            // Return the raw QR data
+            return {
+                qrData: qrCode._oQRCode,
+                options: options
+            };
         } catch (error) {
             throw error;
         }

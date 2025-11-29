@@ -23,12 +23,16 @@ self.addEventListener('message', (e) => {
     
     try {
         // Generate QR code data using the QRCode library
+        // Use the worker wrapper's generateQRData method
         const qrData = QRCode.generateQRData(data, {
             width: options.size || 256,
             height: options.size || 256,
-            colorDark: options.foreground || '#000000',
-            colorLight: options.background || '#FFFFFF',
-            correctLevel: QRCode.CorrectLevel[options.errorCorrectionLevel] || QRCode.CorrectLevel.M
+            color: {
+                dark: options.foreground || '#000000',
+                light: options.background || '#FFFFFF'
+            },
+            margin: options.margin || 4,
+            errorCorrectionLevel: options.errorCorrectionLevel || 'M'
         });
         
         // Send result back to main thread

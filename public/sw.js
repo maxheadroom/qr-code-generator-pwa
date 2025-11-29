@@ -8,12 +8,15 @@ const DYNAMIC_CACHE = `qr-generator-dynamic-v${VERSION}`;
 const STATIC_FILES = [
 	'/',
 	'/index.html',
+	'/test-local-qr.html',
 	'/css/style.css',
 	'/js/app.js',
 	'/js/qr-types.js',
 	'/js/pwa.js',
+	'/js/qr-worker.js',
 	'/js/libs/qrcode.min.js',
 	'/js/libs/qrcode-wrapper.js',
+	'/js/libs/qrcode-worker-wrapper.js',
 	'/manifest.json'
 ];
 
@@ -62,151 +65,58 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
-	const { request } = event;
-	const url = new URL(request.url);
-
-	// Skip non-GET requests
-	if (request.method !== 'GET') {
+	// Skip requests for extensions, dev tools, etc.
+	if (event.request.url.startsWith('chrome-extension://') || 
+		event.request.url.includes('extension') ||
+		event.request.url.includes('devtools')) {
 		return;
 	}
-
-	// Handle different types of requests
-	if (url.origin === self.location.origin) {
-		// Same origin requests
-		event.respondWith(handleSameOriginRequest(request));
-	} else if (url.origin.includes('cdn.jsdelivr.net')) {
-		// CDN requests
-		event.respondWith(handleCDNRequest(request));
-	} else {
-		// Other external requests
-		event.respondWith(handleExternalRequest(request));
-	}
-});
-
-// Handle same origin requests
-async function handleSameOriginRequest(request) {
-	try {
-		// Try network first
-		const networkResponse = await fetch(request);
-		
-		// Cache the response for future use
-		if (networkResponse.ok) {
-			const cache = await caches.open(DYNAMIC_CACHE);
-			cache.put(request, networkResponse.clone());
-		}
-		
-		return networkResponse;
-	} catch (error) {
-		console.log('Network failed, trying cache:', request.url);
-		
-		// Try cache
-		const cachedResponse = await caches.match(request);
-		if (cachedResponse) {
-			return cachedResponse;
-		}
-		
-		// Return offline page for HTML requests
-		if (request.headers.get('accept').includes('text/html')) {
-			return caches.match('/index.html');
-		}
-		
-		throw error;
-	}
-}
-
-// Handle CDN requests
-async function handleCDNRequest(request) {
-	try {
-		// Try cache first for CDN resources
-		const cachedResponse = await caches.match(request);
-		if (cachedResponse) {
-			return cachedResponse;
-		}
-		
-		// Try network
-		const networkResponse = await fetch(request);
-		
-		// Cache successful responses
-		if (networkResponse.ok) {
-			const cache = await caches.open(DYNAMIC_CACHE);
-			cache.put(request, networkResponse.clone());
-		}
-		
-		return networkResponse;
-	} catch (error) {
-		console.log('CDN request failed:', request.url);
-		throw error;
-	}
-}
-
-// Handle external requests
-async function handleExternalRequest(request) {
-	try {
-		// Try network first
-		const networkResponse = await fetch(request);
-		return networkResponse;
-	} catch (error) {
-		console.log('External request failed:', request.url);
-		throw error;
-	}
-}
-
-// Background sync for offline actions
-self.addEventListener('sync', (event) => {
-	console.log('Background sync triggered:', event.tag);
 	
-	if (event.tag === 'background-sync') {
-		event.waitUntil(doBackgroundSync());
+	// For same-origin requests, try cache first, then network
+	if (event.request.url.startsWith(self.location.origin)) {
+		event.respondWith(
+			caches.match(event.request)
+				.then((cachedResponse) => {
+					// Return cached response if found
+					if (cachedResponse) {
+						return cachedResponse;
+					}
+					
+					// Otherwise fetch from network
+					return fetch(event.request)
+						.then((networkResponse) => {
+							// Cache the response for future use (only for GET requests)
+							if (event.request.method === 'GET' && networkResponse.ok) {
+								const responseToCache = networkResponse.clone();
+								caches.open(DYNAMIC_CACHE)
+									.then((cache) => {
+										cache.put(event.request, responseToCache);
+									});
+							}
+							return networkResponse;
+						})
+						.catch((error) => {
+							console.error('Network request failed:', error);
+							// Return a fallback page for HTML requests
+							if (event.request.headers.get('accept').includes('text/html')) {
+								return caches.match('/index.html');
+							}
+							return new Response('Network error occurred', {
+								status: 408,
+								headers: { 'Content-Type': 'text/plain' }
+							});
+						});
+				})
+		);
 	}
 });
 
-async function doBackgroundSync() {
-	try {
-		// Get stored offline actions
-		const offlineActions = await getOfflineActions();
-		
-		for (const action of offlineActions) {
-			try {
-				// Process each offline action
-				await processOfflineAction(action);
-				
-				// Remove from storage if successful
-				await removeOfflineAction(action.id);
-			} catch (error) {
-				console.error('Error processing offline action:', error);
-			}
-		}
-	} catch (error) {
-		console.error('Background sync failed:', error);
-	}
-}
-
-// Get offline actions from IndexedDB
-async function getOfflineActions() {
-	// This would be implemented with IndexedDB
-	// For now, return empty array
-	return [];
-}
-
-// Process offline action
-async function processOfflineAction(action) {
-	// This would process stored offline actions
-	// For now, just log
-	console.log('Processing offline action:', action);
-}
-
-// Remove offline action
-async function removeOfflineAction(actionId) {
-	// This would remove from IndexedDB
-	console.log('Removing offline action:', actionId);
-}
-
-// Push notification handling
+// Handle push notifications
 self.addEventListener('push', (event) => {
 	console.log('Push notification received');
 	
 	const options = {
-		body: event.data ? event.data.text() : 'Nueva notificación de QR Generator',
+		body: event.data ? event.data.text() : 'New notification from QR Generator',
 		icon: '/assets/icons/android-chrome-192x192.png',
 		badge: '/assets/icons/favicon-32x32.png',
 		vibrate: [100, 50, 100],
@@ -217,28 +127,28 @@ self.addEventListener('push', (event) => {
 		actions: [
 			{
 				action: 'explore',
-				title: 'Abrir app',
+				title: 'Open app',
 				icon: '/assets/icons/favicon-32x32.png'
 			},
 			{
 				action: 'close',
-				title: 'Cerrar',
+				title: 'Close',
 				icon: '/assets/icons/favicon-32x32.png'
 			}
 		]
 	};
-
+	
 	event.waitUntil(
 		self.registration.showNotification('QR Generator', options)
 	);
 });
 
-// Notification click handling
+// Handle notification click
 self.addEventListener('notificationclick', (event) => {
 	console.log('Notification clicked:', event.action);
 	
 	event.notification.close();
-
+	
 	if (event.action === 'explore') {
 		event.waitUntil(
 			clients.openWindow('/')
@@ -246,27 +156,11 @@ self.addEventListener('notificationclick', (event) => {
 	}
 });
 
-// Message handling
+// Handle message
 self.addEventListener('message', (event) => {
 	console.log('Message received in SW:', event.data);
 	
 	if (event.data && event.data.type === 'SKIP_WAITING') {
 		self.skipWaiting();
 	}
-	
-	if (event.data && event.data.type === 'CACHE_QR') {
-		event.waitUntil(cacheQRImage(event.data));
-	}
 });
-
-// Cache QR image
-async function cacheQRImage(data) {
-	try {
-		const cache = await caches.open(DYNAMIC_CACHE);
-		const response = await fetch(data.imageUrl);
-		await cache.put(data.url, response);
-		console.log('QR image cached:', data.url);
-	} catch (error) {
-		console.error('Error caching QR image:', error);
-	}
-}
