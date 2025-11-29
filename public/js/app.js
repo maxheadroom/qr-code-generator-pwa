@@ -884,9 +884,7 @@ class QRGeneratorApp {
 			}
 
 			const script = document.createElement('script');
-			script.src = 'https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js';
-			script.integrity = 'sha512-QLvvrxgJTYBqhfghX6F5stSF+Y9K/6qF+6W6GZ+1OJ7j8W5oVMG5eGzZ+JJBJXJ1ETv3q6jE6v8U6o5V+MzBqDg==';
-			script.crossOrigin = 'anonymous';
+			script.src = 'js/libs/FileSaver.min.js'; // Use local version instead of CDN
 			script.onload = () => resolve();
 			script.onerror = () => resolve(); // Continue without FileSaver
 			document.head.appendChild(script);
