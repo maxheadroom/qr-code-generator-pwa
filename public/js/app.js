@@ -657,13 +657,13 @@ class QRGeneratorApp {
                         this.createQRCodeFallback(data, options).then(resolve).catch(reject);
                     };
                     
-                    // Set timeout for worker
+                    // Set timeout for worker (increased to 30 seconds for complex QR codes)
                     setTimeout(() => {
                         worker.terminate();
                         console.warn('Web Worker timeout, falling back to main thread');
                         // Fallback to original method
                         this.createQRCodeFallback(data, options).then(resolve).catch(reject);
-                    }, 10000); // 10 second timeout
+                    }, 30000); // 30 second timeout
                 } catch (error) {
                     console.warn('Error creating Web Worker, falling back to main thread:', error);
                     // Fallback to original method
@@ -678,43 +678,83 @@ class QRGeneratorApp {
 	
 	// Generate QR image from data (used when Web Worker returns QR data)
     generateQRImageFromData(result) {
-        // Handle both the old format (just qrData) and new format (full result object)
-        const qrData = result.qrData || result;
-        const options = result.options || {};
-        
-        // Create canvas
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas size
-        const size = options.width || 256;
-        canvas.width = size;
-        canvas.height = size;
-        
-        // Get QR module count
-        const moduleCount = qrData.getModuleCount();
-        const cellSize = Math.floor(size / moduleCount);
-        const margin = options.margin || 4;
-        
-        // Fill background
-        ctx.fillStyle = options.color?.light || '#FFFFFF';
-        ctx.fillRect(0, 0, size, size);
-        
-        // Draw QR code
-        ctx.fillStyle = options.color?.dark || '#000000';
-        
-        for (let row = 0; row < moduleCount; row++) {
-            for (let col = 0; col < moduleCount; col++) {
-                if (qrData.isDark(row, col)) {
-                    const x = margin + col * cellSize;
-                    const y = margin + row * cellSize;
-                    ctx.fillRect(x, y, cellSize, cellSize);
+        // Handle the new data structure from the Web Worker
+        if (result.modules && result.moduleCount) {
+            // This is data from the Web Worker
+            const modules = result.modules;
+            const moduleCount = result.moduleCount;
+            const options = result.options || {};
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            const size = options.width || 256;
+            canvas.width = size;
+            canvas.height = size;
+            
+            const cellSize = Math.floor(size / moduleCount);
+            const margin = options.margin || 4;
+            
+            // Fill background
+            ctx.fillStyle = options.color?.light || '#FFFFFF';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw QR code from modules data
+            ctx.fillStyle = options.color?.dark || '#000000';
+            
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (modules[row][col]) {
+                        const x = margin + col * cellSize;
+                        const y = margin + row * cellSize;
+                        ctx.fillRect(x, y, cellSize, cellSize);
+                    }
                 }
             }
+            
+            // Convert to data URL
+            return canvas.toDataURL('image/png');
+        } else {
+            // Handle the old format or direct QR data
+            const qrData = result.qrData || result;
+            const options = result.options || {};
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            const size = options.width || 256;
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Get QR module count
+            const moduleCount = qrData.getModuleCount();
+            const cellSize = Math.floor(size / moduleCount);
+            const margin = options.margin || 4;
+            
+            // Fill background
+            ctx.fillStyle = options.color?.light || '#FFFFFF';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw QR code
+            ctx.fillStyle = options.color?.dark || '#000000';
+            
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qrData.isDark(row, col)) {
+                        const x = margin + col * cellSize;
+                        const y = margin + row * cellSize;
+                        ctx.fillRect(x, y, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Convert to data URL
+            return canvas.toDataURL('image/png');
         }
-        
-        // Convert to data URL
-        return canvas.toDataURL('image/png');
     }
 	
 	// Fallback method for QR code generation

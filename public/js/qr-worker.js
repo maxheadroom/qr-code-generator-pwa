@@ -10,11 +10,14 @@ try {
     self.importScripts('libs/qrcode-worker-wrapper.js');
     
     librariesLoaded = true;
+    console.log('QR Worker: Libraries loaded successfully');
 } catch (error) {
     console.error('Failed to load QR code libraries in worker:', error);
 }
 
 self.addEventListener('message', (e) => {
+    console.log('QR Worker: Received message', e.data);
+    
     // If libraries failed to load, send error back
     if (!librariesLoaded) {
         self.postMessage({
@@ -25,11 +28,12 @@ self.addEventListener('message', (e) => {
     }
     
     const { data, options } = e.data;
+    console.log('QR Worker: Processing QR code for data:', data.substring(0, 50) + '...');
     
     try {
         // Generate QR code data using the QRCode library
         // Use the worker wrapper's generateQRData method
-        const qrData = QRCode.generateQRData(data, {
+        const result = QRCode.generateQRData(data, {
             width: options.size || 256,
             height: options.size || 256,
             color: {
@@ -40,13 +44,19 @@ self.addEventListener('message', (e) => {
             errorCorrectionLevel: options.errorCorrectionLevel || 'M'
         });
         
+        console.log('QR Worker: QR code generated successfully');
+        
         // Send result back to main thread
         self.postMessage({
             success: true,
-            qrData: qrData,
-            options: options
+            modules: result.modules,
+            moduleCount: result.moduleCount,
+            options: result.options
         });
+        
+        console.log('QR Worker: Result sent back to main thread');
     } catch (error) {
+        console.error('QR Worker: Error generating QR code:', error);
         // Send error back to main thread
         self.postMessage({
             success: false,
