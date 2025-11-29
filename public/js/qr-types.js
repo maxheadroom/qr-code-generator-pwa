@@ -1,9 +1,11 @@
 // QR Types Configuration
+// Note: Names and descriptions are now translated via the translation system
+// Translation keys follow the pattern: qrType.[type].name and qrType.[type].description
 const QR_TYPES = {
 	url: {
 		id: 'url',
-		name: 'URL',
-		description: 'Enlace a una página web',
+		name: 'URL', // Translated via qrType.url.name
+		description: 'Enlace a una página web', // Translated via qrType.url.description
 		icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
 		category: 'web',
 		fields: [
@@ -20,8 +22,8 @@ const QR_TYPES = {
 
 	text: {
 		id: 'text',
-		name: 'Texto',
-		description: 'Texto libre personalizado',
+		name: 'Texto', // Translated via qrType.text.name
+		description: 'Texto libre personalizado', // Translated via qrType.text.description
 		icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
 		category: 'general',
 		fields: [
@@ -39,8 +41,8 @@ const QR_TYPES = {
 
 	email: {
 		id: 'email',
-		name: 'Email',
-		description: 'Dirección de correo electrónico',
+		name: 'Email', // Translated via qrType.email.name
+		description: 'Dirección de correo electrónico', // Translated via qrType.email.description
 		icon: 'M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
 		category: 'communication',
 		fields: [
@@ -77,8 +79,8 @@ const QR_TYPES = {
 
 	sms: {
 		id: 'sms',
-		name: 'SMS',
-		description: 'Mensaje de texto',
+		name: 'SMS', // Translated via qrType.sms.name
+		description: 'Mensaje de texto', // Translated via qrType.sms.description
 		icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
 		category: 'communication',
 		fields: [
@@ -103,8 +105,8 @@ const QR_TYPES = {
 
 	whatsapp: {
 		id: 'whatsapp',
-		name: 'WhatsApp',
-		description: 'Mensaje de WhatsApp',
+		name: 'WhatsApp', // Translated via qrType.whatsapp.name
+		description: 'Mensaje de WhatsApp', // Translated via qrType.whatsapp.description
 		icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
 		category: 'communication',
 		fields: [
@@ -134,8 +136,8 @@ const QR_TYPES = {
 
 	telegram: {
 		id: 'telegram',
-		name: 'Telegram',
-		description: 'Mensaje de Telegram',
+		name: 'Telegram', // Translated via qrType.telegram.name
+		description: 'Mensaje de Telegram', // Translated via qrType.telegram.description
 		icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
 		category: 'communication',
 		fields: [
@@ -165,8 +167,8 @@ const QR_TYPES = {
 
 	call: {
 		id: 'call',
-		name: 'Llamada',
-		description: 'Realizar una llamada telefónica',
+		name: 'Llamada', // Translated via qrType.call.name
+		description: 'Realizar una llamada telefónica', // Translated via qrType.call.description
 		icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z',
 		category: 'communication',
 		fields: [
@@ -183,8 +185,8 @@ const QR_TYPES = {
 
 	wifi: {
 		id: 'wifi',
-		name: 'WiFi',
-		description: 'Configuración de red WiFi',
+		name: 'WiFi', // Translated via qrType.wifi.name
+		description: 'Configuración de red WiFi', // Translated via qrType.wifi.description
 		icon: 'M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0',
 		category: 'network',
 		fields: [
@@ -238,8 +240,8 @@ const QR_TYPES = {
 
 	vcard: {
 		id: 'vcard',
-		name: 'Contacto',
-		description: 'Información de contacto (vCard)',
+		name: 'Contacto', // Translated via qrType.vcard.name
+		description: 'Información de contacto (vCard)', // Translated via qrType.vcard.description
 		icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
 		category: 'contact',
 		fields: [
@@ -304,8 +306,8 @@ const QR_TYPES = {
 
 	location: {
 		id: 'location',
-		name: 'Ubicación',
-		description: 'Coordenadas GPS',
+		name: 'Ubicación', // Translated via qrType.location.name
+		description: 'Coordenadas GPS', // Translated via qrType.location.description
 		icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z',
 		category: 'location',
 		fields: [
@@ -343,8 +345,8 @@ const QR_TYPES = {
 
 	calendar: {
 		id: 'calendar',
-		name: 'Evento',
-		description: 'Evento de calendario',
+		name: 'Evento', // Translated via qrType.calendar.name
+		description: 'Evento de calendario', // Translated via qrType.calendar.description
 		icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
 		category: 'events',
 		fields: [
@@ -405,8 +407,8 @@ const QR_TYPES = {
 
 	bitcoin: {
 		id: 'bitcoin',
-		name: 'Bitcoin',
-		description: 'Dirección de Bitcoin para pagos',
+		name: 'Bitcoin', // Translated via qrType.bitcoin.name
+		description: 'Dirección de Bitcoin para pagos', // Translated via qrType.bitcoin.description
 		icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z',
 		category: 'payments',
 		fields: [
@@ -443,8 +445,8 @@ const QR_TYPES = {
 
 	ethereum: {
 		id: 'ethereum',
-		name: 'Ethereum',
-		description: 'Dirección de Ethereum para pagos',
+		name: 'Ethereum', // Translated via qrType.ethereum.name
+		description: 'Dirección de Ethereum para pagos', // Translated via qrType.ethereum.description
 		icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z',
 		category: 'payments',
 		fields: [
@@ -474,8 +476,8 @@ const QR_TYPES = {
 
 	paypal: {
 		id: 'paypal',
-		name: 'PayPal',
-		description: 'Enlace de pago PayPal',
+		name: 'PayPal', // Translated via qrType.paypal.name
+		description: 'Enlace de pago PayPal', // Translated via qrType.paypal.description
 		icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z',
 		category: 'payments',
 		fields: [

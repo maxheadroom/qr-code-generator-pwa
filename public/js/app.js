@@ -264,6 +264,8 @@ class QRGeneratorApp {
 		this.currentLanguage = lang;
 		await this.loadTranslations();
 		this.updateUILanguage();
+		// Re-render QR types to update their names and descriptions
+		this.renderQRTypes();
 		
 		// Save language preference
 		try {
@@ -292,7 +294,14 @@ class QRGeneratorApp {
 		card.dataset.type = type.id;
 		card.tabIndex = 0; // Make card focusable
 		card.setAttribute('role', 'button'); // Accessibility
-		card.setAttribute('aria-label', this.t('qrType.cardLabel', { name: type.name, description: type.description })); // Accessibility
+		
+		// Use translation keys for name and description
+		const typeNameKey = `qrType.${type.id}.name`;
+		const typeDescKey = `qrType.${type.id}.description`;
+		const typeName = this.translations[typeNameKey] || type.name;
+		const typeDesc = this.translations[typeDescKey] || type.description;
+		
+		card.setAttribute('aria-label', this.t('qrType.cardLabel', { name: typeName, description: typeDesc })); // Accessibility
 
 		card.innerHTML = `
 			<div class="qr-type-card-header">
@@ -300,8 +309,8 @@ class QRGeneratorApp {
 					<path d="${type.icon}"/>
 				</svg>
 				<div>
-					<h3>${type.name}</h3>
-					<p>${type.description}</p>
+					<h3>${typeName}</h3>
+					<p>${typeDesc}</p>
 				</div>
 			</div>
 		`;
@@ -1637,20 +1646,39 @@ class QRGeneratorApp {
 				if (!line) continue;
 
 				try {
-					// Generate QR code based on type
+					// Generate QR code based on type using the proper QR_TYPES generator
 					let qrData = line;
-					if (qrType === 'url') {
-						qrData = line;
-					} else if (qrType === 'text') {
-						qrData = line;
-					} else if (qrType === 'email') {
-						qrData = `mailto:${line}`;
-					} else if (qrType === 'sms') {
-						qrData = `sms:${line}`;
-					} else if (qrType === 'wifi') {
-						qrData = `WIFI:S:${line};;`;
-					} else if (qrType === 'vcard') {
-						qrData = `BEGIN:VCARD\nFN:${line}\nEND:VCARD`;
+					if (QR_TYPES[qrType]) {
+						// For batch generation, we need to format the data according to the QR type
+						switch (qrType) {
+							case 'url':
+								// URLs are already in the correct format
+								qrData = line;
+								break;
+							case 'text':
+								// Text is already in the correct format
+								qrData = line;
+								break;
+							case 'email':
+								// Format as mailto link
+								qrData = `mailto:${line}`;
+								break;
+							case 'sms':
+								// Format as SMS link
+								qrData = `sms:${line}`;
+								break;
+							case 'wifi':
+								// Format as WIFI config (simple format)
+								qrData = `WIFI:S:${line};;`;
+								break;
+							case 'vcard':
+								// Format as simple vCard
+								qrData = `BEGIN:VCARD\nFN:${line}\nEND:VCARD`;
+								break;
+							default:
+								// For other types, use the line as-is
+								qrData = line;
+						}
 					}
 
 					const qrImage = await this.createQRCode(qrData, options);

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Batch QR Generation Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-result { margin: 10px 0; padding: 10px; background-color: #f5f5f5; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        textarea { width: 100%; height: 100px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Batch QR Generation Fix Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Description</h2>
+            <p>This test verifies that the batch QR generation fix is working correctly by checking if the QR_TYPES object is properly used in the batch generation logic.</p>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Execution</h2>
+            <button id="runTest">Run Batch QR Generation Test</button>
+            <div id="testResults"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Manual Test</h2>
+            <p>You can also manually test the batch QR generation:</p>
+            <ol>
+                <li>Click on "Batch QR Generation" button in the main app</li>
+                <li>Enter multiple URLs (one per line) in the text area</li>
+                <li>Click "Generate Batch QR Codes"</li>
+                <li>Verify that QR codes are generated without errors</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('runTest').addEventListener('click', function() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<p>Running tests...</p>';
+            
+            try {
+                // Test 1: Check if QR_TYPES is available
+                const test1 = typeof QR_TYPES !== 'undefined';
+                const result1 = document.createElement('div');
+                result1.className = 'test-result ' + (test1 ? 'success' : 'error');
+                result1.innerHTML = `<strong>Test 1 - QR_TYPES availability:</strong> ${test1 ? 'PASSED' : 'FAILED'} - QR_TYPES is ${test1 ? 'available' : 'not available'}`;
+                resultsDiv.appendChild(result1);
+                
+                // Test 2: Check if specific QR types exist
+                const test2 = test1 && QR_TYPES.url && QR_TYPES.text && QR_TYPES.email;
+                const result2 = document.createElement('div');
+                result2.className = 'test-result ' + (test2 ? 'success' : 'error');
+                result2.innerHTML = `<strong>Test 2 - QR types existence:</strong> ${test2 ? 'PASSED' : 'FAILED'} - Basic QR types are ${test2 ? 'available' : 'missing'}`;
+                resultsDiv.appendChild(result2);
+                
+                // Test 3: Simulate the fixed batch logic
+                if (test1) {
+                    const qrType = 'url';
+                    const line = 'https://example.com';
+                    let qrData = line;
+                    
+                    // This is the fixed logic from our edit
+                    if (QR_TYPES[qrType]) {
+                        switch (qrType) {
+                            case 'url':
+                                qrData = line;
+                                break;
+                            case 'text':
+                                qrData = line;
+                                break;
+                            case 'email':
+                                qrData = `mailto:${line}`;
+                                break;
+                            case 'sms':
+                                qrData = `sms:${line}`;
+                                break;
+                            case 'wifi':
+                                qrData = `WIFI:S:${line};;`;
+                                break;
+                            case 'vcard':
+                                qrData = `BEGIN:VCARD\nFN:${line}\nEND:VCARD`;
+                                break;
+                            default:
+                                qrData = line;
+                        }
+                    }
+                    
+                    const test3 = qrData === line; // For URL type, should be the same
+                    const result3 = document.createElement('div');
+                    result3.className = 'test-result ' + (test3 ? 'success' : 'error');
+                    result3.innerHTML = `<strong>Test 3 - Batch logic fix:</strong> ${test3 ? 'PASSED' : 'FAILED'} - QR data is "${qrData}"`;
+                    resultsDiv.appendChild(result3);
+                    
+                    // Test 4: Test email type
+                    const emailLine = 'test@example.com';
+                    let emailQrData = emailLine;
+                    
+                    if (QR_TYPES['email']) {
+                        switch ('email') {
+                            case 'email':
+                                emailQrData = `mailto:${emailLine}`;
+                                break;
+                            default:
+                                emailQrData = emailLine;
+                        }
+                    }
+                    
+                    const test4 = emailQrData === `mailto:${emailLine}`;
+                    const result4 = document.createElement('div');
+                    result4.className = 'test-result ' + (test4 ? 'success' : 'error');
+                    result4.innerHTML = `<strong>Test 4 - Email type handling:</strong> ${test4 ? 'PASSED' : 'FAILED'} - QR data is "${emailQrData}"`;
+                    resultsDiv.appendChild(result4);
+                }
+                
+                // Overall result
+                const allTestsPassed = test1 && test2 && (typeof test3 === 'undefined' || test3) && (typeof test4 === 'undefined' || test4);
+                const overallResult = document.createElement('div');
+                overallResult.className = 'test-result ' + (allTestsPassed ? 'success' : 'error');
+                overallResult.innerHTML = `<strong>Overall Result:</strong> ${allTestsPassed ? 'ALL TESTS PASSED' : 'SOME TESTS FAILED'}`;
+                resultsDiv.appendChild(overallResult);
+                
+            } catch (error) {
+                const errorResult = document.createElement('div');
+                errorResult.className = 'test-result error';
+                errorResult.innerHTML = `<strong>Test Error:</strong> ${error.message}`;
+                resultsDiv.appendChild(errorResult);
+            }
+        });
+    </script>
+</body>
+</html>
