@@ -8,7 +8,10 @@ class PWA {
 	}
 
 	init() {
-		this.registerServiceWorker();
+		// Only register service worker if we're not on file:// protocol
+		if (window.location.protocol !== 'file:') {
+			this.registerServiceWorker();
+		}
 		this.setupInstallPrompt();
 		this.checkInstallation();
 		this.setupUpdateNotification();

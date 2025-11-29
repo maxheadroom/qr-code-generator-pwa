@@ -1262,22 +1262,6 @@ body {
 	box-shadow: var(--shadow-lg);
 }
 
-.donation-btn[data-crypto="bitcoin"] {
-	background: linear-gradient(135deg, #f7931a, #ff9500);
-	color: white;
-}
-
-.donation-btn[data-crypto="monero"] {
-	background: linear-gradient(135deg, #ff6600, #ff8800);
-	color: white;
-}
-
-.donation-btn[data-crypto="ethereum"] {
-	background: linear-gradient(135deg, #627eea, #8b9dc3);
-	color: white;
-}
-
-
 
 .donation-btn svg {
 	width: 1.5rem;

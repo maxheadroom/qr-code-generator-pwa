@@ -1,0 +1,63 @@
+// QRCode.js Worker Wrapper - Provides toDataURL function for Web Workers
+// This wrapper uses the official QRCode.js library to generate QR codes as data URLs in a Web Worker
+
+(function() {
+    'use strict';
+    
+    // Check if QRCode is available
+    if (typeof QRCode === 'undefined') {
+        console.error('QRCode library not loaded');
+        return;
+    }
+    
+    // Store the original QRCode constructor
+    var OriginalQRCode = QRCode;
+    
+    // Create a wrapper that provides toDataURL functionality without DOM access
+    var QRCodeWorkerWrapper = function(element, options) {
+        // In a worker, we only support string elements (the text to encode)
+        if (typeof element === 'string') {
+            // Create a QRCode instance without a DOM element
+            this._qrCode = new OriginalQRCode(null, options);
+            this._qrCode.makeCode(element);
+        } else {
+            this._qrCode = new OriginalQRCode(element, options);
+        }
+    };
+    
+    // Add toDataURL method to the wrapper that works in a Web Worker
+    QRCodeWorkerWrapper.prototype.toDataURL = function(options) {
+        options = options || {};
+        
+        // Get the QR code data
+        var qrData = this._qrCode._oQRCode;
+        if (!qrData) {
+            throw new Error('QR Code not generated');
+        }
+        
+        // Since we can't use canvas in a Web Worker, we'll return the raw data
+        // and let the main thread create the image
+        return {
+            qrData: qrData,
+            options: options
+        };
+    };
+    
+    // Add static method for generating QR codes in a Web Worker
+    QRCodeWorkerWrapper.generateQRData = function(text, options) {
+        try {
+            var wrapper = new QRCodeWorkerWrapper(text, options);
+            return wrapper.toDataURL(options);
+        } catch (error) {
+            throw error;
+        }
+    };
+    
+    // Replace the global QRCode with our worker wrapper
+    self.QRCode = QRCodeWorkerWrapper;
+    
+    // Keep the original available
+    self.OriginalQRCode = OriginalQRCode;
+    
+    console.log('QRCode worker wrapper loaded successfully');
+})();

@@ -1,14 +1,14 @@
 {
 	"name": "QR Generator Offline",
 	"short_name": "QR Generator",
-	"description": "Generador de códigos QR offline - Crea QR para URLs, contactos, WiFi y más",
+	"description": "Offline QR Code Generator - Create QR codes for URLs, contacts, WiFi and more",
 	"start_url": "/",
 	"display": "standalone",
 	"background_color": "#ffffff",
 	"theme_color": "#2563eb",
 	"orientation": "portrait-primary",
 	"scope": "/",
-	"lang": "es",
+	"lang": "en",
 	"categories": ["utilities", "productivity"],
 	"icons": [
 		{
@@ -44,9 +44,9 @@
 	],
 	"shortcuts": [
 		{
-			"name": "Generar URL QR",
+			"name": "Generate URL QR",
 			"short_name": "URL QR",
-			"description": "Crear QR para una URL",
+			"description": "Create QR for a URL",
 			"url": "/?type=url",
 			"icons": [
 				{
@@ -56,9 +56,9 @@
 			]
 		},
 		{
-			"name": "Generar WiFi QR",
+			"name": "Generate WiFi QR",
 			"short_name": "WiFi QR",
-			"description": "Crear QR para configuración WiFi",
+			"description": "Create QR for WiFi configuration",
 			"url": "/?type=wifi",
 			"icons": [
 				{
@@ -68,9 +68,9 @@
 			]
 		},
 		{
-			"name": "Generar Contacto QR",
-			"short_name": "Contacto QR",
-			"description": "Crear QR para información de contacto",
+			"name": "Generate Contact QR",
+			"short_name": "Contact QR",
+			"description": "Create QR for contact information",
 			"url": "/?type=vcard",
 			"icons": [
 				{

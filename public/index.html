@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Generador de códigos QR offline - Crea QR para URLs, contactos, WiFi, pagos y más. Funciona sin internet.">
-	<meta name="keywords" content="QR, código QR, generador QR, offline, PWA, Cuba, Bitcoin">
+	<meta name="description" content="World's best offline QR Code Generator - Create QR codes for URLs, contacts, WiFi, payments and more without internet. Free, fast and secure PWA.">
+	<meta name="keywords" content="QR, QR code, QR generator, offline, PWA, barcode, vCard, WiFi QR, Bitcoin QR, free QR, instant QR">
 	<meta name="author" content="QR Generator">
+	<meta name="robots" content="index, follow">
 	
 	<!-- PWA Meta Tags -->
 	<meta name="theme-color" content="#2563eb">
@@ -14,17 +15,57 @@
 	<meta name="apple-mobile-web-app-title" content="QR Generator">
 	
 	<!-- Open Graph -->
-	<meta property="og:title" content="Generador QR Offline">
-	<meta property="og:description" content="Crea códigos QR sin internet para URLs, contactos, WiFi y más">
+	<meta property="og:title" content="QR Generator - Offline QR Code Generator">
+	<meta property="og:description" content="Create QR codes offline for URLs, contacts, WiFi, payments and more. Works without internet. Free and secure PWA.">
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="https://qr-generator.com">
+	<meta property="og:image" content="https://qr-generator.com/assets/img/qr-preview.png">
+	<meta property="og:locale" content="en_US">
+	
+	<!-- Hreflang tags for international SEO -->
+	<link rel="alternate" hreflang="en" href="https://qr-generator.com/">
+	<link rel="alternate" hreflang="es" href="https://qr-generator.com/?lang=es">
+	<link rel="alternate" hreflang="pt" href="https://qr-generator.com/?lang=pt">
+	<link rel="alternate" hreflang="fr" href="https://qr-generator.com/?lang=fr">
+	<link rel="alternate" hreflang="x-default" href="https://qr-generator.com/">
+	
+	<!-- Sitemap -->
+	<link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
 	
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image">
-	<meta name="twitter:title" content="Generador QR Offline">
-	<meta name="twitter:description" content="Crea códigos QR sin internet">
+	<meta name="twitter:title" content="QR Generator - Offline QR Code Generator">
+	<meta name="twitter:description" content="Create QR codes offline for URLs, contacts, WiFi, payments and more. Works without internet. Free and secure PWA.">
+	<meta name="twitter:image" content="https://qr-generator.com/assets/img/qr-preview.png">
+	<meta name="twitter:site" content="@qrgenerator">
 	
-	<title>Generador QR Offline - Crea QR sin Internet</title>
+	<!-- Canonical URL -->
+	<link rel="canonical" href="https://qr-generator.com/">
+	
+	<!-- Structured Data -->
+	<script type="application/ld+json">
+	{
+	  "@context": "https://schema.org",
+	  "@type": "SoftwareApplication",
+	  "name": "QR Generator",
+	  "operatingSystem": "All",
+	  "offers": {
+	    "@type": "Offer",
+	    "price": "0",
+	    "priceCurrency": "USD"
+	  },
+	  "applicationCategory": "UtilitiesApplication",
+	  "featureList": [
+	    "Offline QR Code Generation",
+	    "Multiple QR Types",
+	    "Customizable Designs",
+	    "No Registration Required",
+	    "Privacy Focused"
+	  ]
+	}
+	</script>
+	
+	<title data-i18n="title">QR Generator - Offline QR Code Generator | Create QR Codes Without Internet</title>
 	
 	<!-- Manifest -->
 	<link rel="manifest" href="manifest.json">
@@ -51,6 +92,7 @@
 	<!-- External Libraries -->
 	<script src="js/libs/qrcode.min.js"></script>
 	<script src="js/libs/qrcode-wrapper.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 	
 		<!-- QR Library Load Check -->
 	<script>
@@ -65,7 +107,7 @@
 </head>
 <body>
 	<!-- Header -->
-	<header class="header">
+	<header class="header" role="banner">
 		<div class="container">
 			<div class="header-content">
 				<div class="logo">
@@ -74,18 +116,24 @@
 					</svg>
 					<h1>QR Generator</h1>
 				</div>
-				<nav class="nav">
-					<button class="nav-btn" id="installBtn" style="display: none;" title="Instalar aplicación PWA">
+				<nav class="nav" role="navigation" aria-label="Main navigation">
+					<select id="languageSelector" class="nav-btn" aria-label="Select language">
+						<option value="en">English</option>
+						<option value="es">Español</option>
+						<option value="pt">Português</option>
+						<option value="fr">Français</option>
+					</select>
+					<button class="nav-btn" id="installBtn" style="display: none;" title="Install PWA application" aria-label="Install application">
 						<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 							<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
 						</svg>
-						Instalar
+						<span aria-hidden="true" data-i18n="nav.install">Install</span>
 					</button>
-					<button class="nav-btn" id="themeToggle">
-						<svg class="sun-icon" viewBox="0 0 24 24" fill="currentColor">
+					<button class="nav-btn" id="themeToggle" data-i18n-title="nav.theme" aria-label="Toggle theme" title="Toggle light/dark theme">
+						<svg class="sun-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 							<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
 						</svg>
-						<svg class="moon-icon" viewBox="0 0 24 24" fill="currentColor">
+						<svg class="moon-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 							<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
 						</svg>
 					</button>
@@ -95,31 +143,122 @@
 	</header>
 
 	<!-- Main Content -->
-	<main class="main">
+	<main class="main" role="main">
 		<div class="container">
 			<!-- QR Type Selection -->
-			<section class="qr-type-section">
-				<h2>Selecciona el tipo de QR</h2>
-				<div class="qr-type-grid" id="qrTypeGrid">
+			<section class="qr-type-section" aria-labelledby="qrTypeHeading">
+				<h2 id="qrTypeHeading" data-i18n="qrType.heading">Select QR Type</h2>
+				<div class="qr-type-grid" id="qrTypeGrid" role="radiogroup" aria-label="QR code types">
 					<!-- QR Types will be populated by JavaScript -->
+				</div>
+				<div class="qr-type-actions">
+					<button class="btn btn-secondary" id="showScannerBtn">
+						<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+							<path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"/>
+						</svg>
+						<span data-i18n="qrType.scan">Scan QR Code</span>
+					</button>
+					<button class="btn btn-secondary" id="showBatchBtn">
+						<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+							<path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v12h16V6H4zm2 2h2v2H6V8zm0 4h2v2H6v-2zm0 4h2v2H6v-2zm4-8h6v2h-6V8zm0 4h6v2h-6v-2zm0 4h6v2h-6v-2z"/>
+						</svg>
+						<span data-i18n="qrType.batch">Batch QR Generation</span>
+					</button>
+				</div>
+			</section>
+
+			<!-- QR Scanner Section -->
+			<section class="qr-scanner-section" id="qrScannerSection" style="display: none;">
+				<h2 data-i18n="scanner.heading">Scan QR Code</h2>
+				<div class="scanner-container">
+					<div class="scanner-preview" id="scannerPreview">
+						<video id="scannerVideo" playsinline style="width: 100%; max-width: 500px;"></video>
+						<canvas id="scannerCanvas" style="display: none;"></canvas>
+						<div class="scanner-overlay">
+							<div class="scanner-frame"></div>
+							<p data-i18n="scanner.point">Point your camera at a QR code</p>
+						</div>
+					</div>
+					<div class="scanner-controls">
+						<button class="btn btn-primary" id="startScannerBtn" data-i18n="scanner.start">Start Camera</button>
+						<button class="btn btn-secondary" id="stopScannerBtn" data-i18n="scanner.stop" disabled>Stop Camera</button>
+					</div>
+					<div class="scanner-result" id="scannerResult" style="display: none;">
+						<h3 data-i18n="scanner.result">Scanned Content</h3>
+						<div class="result-content" id="resultContent"></div>
+						<div class="result-actions">
+							<button class="btn btn-primary" id="copyResultBtn" data-i18n="scanner.copy">Copy</button>
+							<button class="btn btn-secondary" id="openResultBtn" data-i18n="scanner.open">Open</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Batch QR Generation Section -->
+			<section class="batch-qr-section" id="batchQRSection" style="display: none;">
+				<h2 data-i18n="batch.heading">Batch QR Generation</h2>
+				<div class="batch-container">
+					<div class="batch-input">
+						<label for="batchData" data-i18n="batch.label">Enter data for multiple QR codes (one per line):</label>
+						<textarea id="batchData" class="form-control" rows="10" data-i18n-placeholder="batch.placeholder" placeholder="Enter one QR code data per line&#10;Example:&#10;https://example.com&#10;https://google.com&#10;Hello World&#10;Contact: John Doe"></textarea>
+					</div>
+					<div class="batch-options">
+						<div class="form-group">
+							<label for="batchQRType" data-i18n="batch.type">QR Type:</label>
+							<select id="batchQRType" class="form-control">
+								<option value="url">URL</option>
+								<option value="text">Text</option>
+								<option value="email">Email</option>
+								<option value="sms">SMS</option>
+								<option value="wifi">WiFi</option>
+								<option value="vcard">Contact</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="batchSize" data-i18n="batch.size">QR Size:</label>
+							<select id="batchSize" class="form-control">
+								<option value="128">128x128 - Small</option>
+								<option value="256" selected>256x256 - Standard</option>
+								<option value="512">512x512 - Large</option>
+								<option value="1024">1024x1024 - HD</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="batchErrorLevel" data-i18n="batch.error">Error Correction:</label>
+							<select id="batchErrorLevel" class="form-control">
+								<option value="L">Low (7%) - More data</option>
+								<option value="M" selected>Medium (15%) - Balanced</option>
+								<option value="Q">High (25%) - More robust</option>
+								<option value="H">Maximum (30%) - Very robust</option>
+							</select>
+						</div>
+					</div>
+					<div class="batch-actions">
+						<button class="btn btn-primary" id="generateBatchBtn" data-i18n="batch.generate">Generate Batch QR Codes</button>
+						<button class="btn btn-secondary" id="downloadBatchBtn" data-i18n="batch.download" disabled>Download All</button>
+					</div>
+					<div class="batch-results" id="batchResults" style="display: none;">
+						<h3 data-i18n="batch.results">Generated QR Codes</h3>
+						<div class="results-grid" id="batchResultsGrid"></div>
+					</div>
 				</div>
 			</section>
 
 			<!-- QR Generator Form -->
-			<section class="qr-generator-section" id="qrGeneratorSection" style="display: none;">
+			<section class="qr-generator-section" id="qrGeneratorSection" style="display: none;" aria-labelledby="formTitle">
 				<div class="generator-container">
 					<!-- Form Area -->
 					<div class="form-area">
 						<div class="form-header">
-							<h3 id="formTitle">Generar QR</h3>
-							<button class="close-btn" id="closeForm">
-								<svg viewBox="0 0 24 24" fill="currentColor">
+							<h3 id="formTitle" data-i18n="form.generate">Generate QR</h3>
+							<button class="close-btn" id="closeForm" data-i18n-title="form.close" aria-label="Close form">
+								<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 									<path d="M6 18L18 6M6 6l12 12"/>
 								</svg>
 							</button>
 						</div>
 						
-						<form id="qrForm" class="qr-form">
+						<form id="qrForm" class="qr-form" role="form" aria-label="QR code generation form">
 							<!-- Dynamic form fields will be inserted here -->
 						</form>
 						
@@ -129,59 +268,59 @@
 									<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
 					<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
 				</svg>
-								Vista Previa
+								<span data-i18n="form.preview">Preview</span>
 							</button>
 							<button type="submit" class="btn btn-primary" id="generateBtn">
 								<svg viewBox="0 0 24 24" fill="currentColor">
 									<path d="M12 4v16m8-8H4"/>
 								</svg>
-								Generar QR
+								<span data-i18n="form.generate">Generate QR</span>
 							</button>
 						</div>
 					</div>
 
 					<!-- Preview Area -->
-					<div class="preview-area">
+					<div class="preview-area" role="region" aria-label="QR code preview">
 						<div class="preview-header">
-							<h3>Vista Previa</h3>
+							<h3 data-i18n="preview.heading">Preview</h3>
 							<div class="preview-controls">
-								<button class="control-btn" id="downloadBtn" disabled>
+								<button class="control-btn" id="downloadBtn" data-i18n="preview.download" disabled>
 									<svg viewBox="0 0 24 24" fill="currentColor">
 										<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
 										<polyline points="7,10 12,15 17,10"/>
 										<line x1="12" y1="15" x2="12" y2="3"/>
 									</svg>
-									Descargar
+									<span data-i18n="preview.download">Download</span>
 								</button>
-								<button class="control-btn" id="shareBtn" disabled>
+								<button class="control-btn" id="shareBtn" data-i18n="preview.share" disabled>
 									<svg viewBox="0 0 24 24" fill="currentColor">
 										<path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/>
 										<polyline points="16,6 12,2 8,6"/>
 										<line x1="12" y1="2" x2="12" y2="15"/>
 									</svg>
-									Compartir
+									<span data-i18n="preview.share">Share</span>
 								</button>
 							</div>
 						</div>
 						
-						<div class="qr-preview" id="qrPreview">
+						<div class="qr-preview" id="qrPreview" role="img" aria-label="QR code preview area">
 							<div class="placeholder">
-								<svg viewBox="0 0 24 24" fill="currentColor">
+								<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 									<path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h8v6h-8V3zm2 2v2h4V5h-4zM3 11h6v6H3v-6zm2 2v2h2v-2H5zm8-2h8v6h-8v-6zm2 2v2h4v-2h-4z"/>
 								</svg>
-								<p>Selecciona un tipo y genera tu QR</p>
+								<p data-i18n="preview.placeholder">Select a type and generate your QR</p>
 							</div>
 						</div>
 						
 						<div class="qr-info" id="qrInfo" style="display: none;">
 							<div class="info-item">
-								<strong>Tipo:</strong> <span id="qrTypeInfo">-</span>
+								<strong data-i18n="info.type">Type:</strong> <span id="qrTypeInfo">-</span>
 							</div>
 							<div class="info-item">
-								<strong>Tamaño:</strong> <span id="qrSizeInfo">-</span>
+								<strong data-i18n="info.size">Size:</strong> <span id="qrSizeInfo">-</span>
 							</div>
 							<div class="info-item">
-								<strong>Corrección:</strong> <span id="qrErrorInfo">-</span>
+								<strong data-i18n="info.error">Correction:</strong> <span id="qrErrorInfo">-</span>
 							</div>
 						</div>
 					</div>
@@ -191,46 +330,46 @@
 			<!-- QR Customization -->
 			<section class="qr-customization" id="qrCustomization" style="display: none;">
 				<div class="customization-header">
-					<h3>🎨 Personalizar QR</h3>
-					<p>Haz tu QR único con colores, tamaño y efectos personalizados</p>
+					<h3 data-i18n="customize.heading">🎨 Personalize QR</h3>
+					<p data-i18n="customize.description">Make your QR unique with custom colors, size and effects</p>
 				</div>
 				
 				<div class="customization-tabs">
-					<button class="tab-btn active" data-tab="basic">Básico</button>
-					<button class="tab-btn" data-tab="advanced">Avanzado</button>
-					<button class="tab-btn" data-tab="effects">Efectos</button>
+					<button class="tab-btn active" data-tab="basic" data-i18n="customize.basic">Basic</button>
+					<button class="tab-btn" data-tab="advanced" data-i18n="customize.advanced">Advanced</button>
+					<button class="tab-btn" data-tab="effects" data-i18n="customize.effects">Effects</button>
 				</div>
 				
 				<!-- Basic Tab -->
 				<div class="tab-content active" id="basic-tab">
 					<div class="customization-grid">
 						<div class="customization-group">
-							<label for="qrSize">
+							<label for="qrSize" data-i18n="basic.size">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"/>
 								</svg>
-								Tamaño
+								<span data-i18n="basic.size">Size</span>
 							</label>
 							<select id="qrSize" class="form-control">
-								<option value="128">128x128 - Pequeño</option>
-								<option value="256" selected>256x256 - Estándar</option>
-								<option value="512">512x512 - Grande</option>
+								<option value="128">128x128 - Small</option>
+								<option value="256" selected>256x256 - Standard</option>
+								<option value="512">512x512 - Large</option>
 								<option value="1024">1024x1024 - HD</option>
 							</select>
 						</div>
 						
 						<div class="customization-group">
-							<label for="qrErrorLevel">
+							<label for="qrErrorLevel" data-i18n="basic.error">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
 								</svg>
-								Corrección de Errores
+								<span data-i18n="basic.error">Error Correction</span>
 							</label>
 							<select id="qrErrorLevel" class="form-control">
-								<option value="L">Bajo (7%) - Más datos</option>
-								<option value="M" selected>Medio (15%) - Balanceado</option>
-								<option value="Q">Alto (25%) - Más robusto</option>
-								<option value="H">Máximo (30%) - Muy robusto</option>
+								<option value="L">Low (7%) - More data</option>
+								<option value="M" selected>Medium (15%) - Balanced</option>
+								<option value="Q">High (25%) - More robust</option>
+								<option value="H">Maximum (30%) - Very robust</option>
 							</select>
 						</div>
 					</div>
@@ -240,11 +379,11 @@
 				<div class="tab-content" id="advanced-tab">
 					<div class="customization-grid">
 						<div class="customization-group">
-							<label for="qrForeground">
+							<label for="qrForeground" data-i18n="advanced.foreground">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
 								</svg>
-								Color Principal
+								<span data-i18n="advanced.foreground">Foreground Color</span>
 							</label>
 							<div class="color-input-group">
 								<input type="color" id="qrForeground" value="#000000" class="form-control color-picker">
@@ -253,11 +392,11 @@
 						</div>
 						
 						<div class="customization-group">
-							<label for="qrBackground">
+							<label for="qrBackground" data-i18n="advanced.background">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 								</svg>
-								Color de Fondo
+								<span data-i18n="advanced.background">Background Color</span>
 							</label>
 							<div class="color-input-group">
 								<input type="color" id="qrBackground" value="#FFFFFF" class="form-control color-picker">
@@ -266,11 +405,11 @@
 						</div>
 						
 						<div class="customization-group">
-							<label for="qrMargin">
+							<label for="qrMargin" data-i18n="advanced.margin">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
 								</svg>
-								Margen
+								<span data-i18n="advanced.margin">Margin</span>
 							</label>
 							<div class="range-input-group">
 								<input type="range" id="qrMargin" min="0" max="4" value="4" class="form-control range-slider">
@@ -279,16 +418,16 @@
 						</div>
 						
 						<div class="customization-group">
-							<label for="qrStyle">
+							<label for="qrStyle" data-i18n="advanced.style">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
 								</svg>
-								Estilo de Puntos
+								<span data-i18n="advanced.style">Dot Style</span>
 							</label>
 							<select id="qrStyle" class="form-control">
-								<option value="square" selected>Cuadrados</option>
-								<option value="rounded">Redondeados</option>
-								<option value="dots">Puntos</option>
+								<option value="square" selected>Square</option>
+								<option value="rounded">Rounded</option>
+								<option value="dots">Dots</option>
 							</select>
 						</div>
 					</div>
@@ -298,11 +437,11 @@
 				<div class="tab-content" id="effects-tab">
 					<div class="customization-grid">
 						<div class="customization-group">
-							<label for="logoUpload">
+							<label for="logoUpload" data-i18n="effects.logo">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 								</svg>
-								Logo Central
+								<span data-i18n="effects.logo">Center Logo</span>
 							</label>
 							<div class="file-upload-area" id="fileUploadArea">
 								<input type="file" id="logoUpload" accept="image/*" class="form-control file-input">
@@ -310,8 +449,8 @@
 									<svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
 										<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
 									</svg>
-									<p>Arrastra una imagen o haz clic para seleccionar</p>
-									<span>PNG, JPG hasta 2MB</span>
+									<p data-i18n="upload.placeholder">Drag an image or click to select</p>
+									<span data-i18n="upload.supported">PNG, JPG up to 2MB</span>
 								</div>
 							</div>
 							<div class="logo-preview" id="logoPreview" style="display: none;">
@@ -322,7 +461,7 @@
 											<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
 												<path d="M6 18L18 6M6 6l12 12"/>
 											</svg>
-											Eliminar
+											<span data-i18n="actions.remove">Remove</span>
 										</button>
 									</div>
 								</div>
@@ -330,11 +469,11 @@
 						</div>
 						
 						<div class="customization-group">
-							<label for="qrGradient">
+							<label for="qrGradient" data-i18n="effects.gradient">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 									<path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
 								</svg>
-								Gradiente
+								<span data-i18n="effects.gradient">Gradient</span>
 							</label>
 							<div class="gradient-controls">
 								<div class="gradient-input-group">
@@ -353,83 +492,79 @@
 				</div>
 				
 				<div class="customization-actions">
-					<button type="button" class="btn btn-secondary" id="resetCustomization">
+					<button type="button" class="btn btn-secondary" id="resetCustomization" data-i18n="actions.reset">
 						<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 							<path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/>
 							<path d="M21 3v5h-5"/>
 							<path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/>
 							<path d="M3 21v-5h5"/>
 						</svg>
-						Restablecer
+						<span data-i18n="actions.reset">Reset</span>
 					</button>
-					<button type="button" class="btn btn-primary" id="applyCustomization">
+					<button type="button" class="btn btn-primary" id="applyCustomization" data-i18n="actions.apply">
 						<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 							<path d="M5 13l4 4L19 7"/>
 						</svg>
-						Aplicar Cambios
+						<span data-i18n="actions.apply">Apply Changes</span>
 					</button>
+					<div class="export-options">
+						<label data-i18n="export.label">Export Format:</label>
+						<div class="export-buttons">
+							<button type="button" class="btn btn-small btn-secondary" id="exportPNG" data-i18n="export.png">PNG</button>
+							<button type="button" class="btn btn-small btn-secondary" id="exportSVG" data-i18n="export.svg">SVG</button>
+							<button type="button" class="btn btn-small btn-secondary" id="exportPDF" data-i18n="export.pdf">PDF</button>
+						</div>
+					</div>
 				</div>
 			</section>
 
 			<!-- History Section -->
 			<section class="history-section" id="historySection" style="display: none;">
-				<h3>Historial de QR</h3>
+				<h3 data-i18n="history.heading">QR History</h3>
 				<div class="history-grid" id="historyGrid">
 					<!-- History items will be populated by JavaScript -->
 				</div>
-				<button class="btn btn-secondary" id="clearHistory">Limpiar Historial</button>
+				<button class="btn btn-secondary" id="clearHistory" data-i18n="history.clear">Clear History</button>
 			</section>
 		</div>
 	</main>
 
 	<!-- Footer -->
-	<footer class="footer">
+	<footer class="footer" role="contentinfo">
 		<div class="container">
 			<div class="footer-content">
 				<div class="footer-section">
-					<h4>QR Generator</h4>
-					<p>Genera códigos QR sin internet. Funciona offline como PWA.</p>
+					<h4 data-i18n="footer.title">QR Generator</h4>
+					<p data-i18n="footer.description">Generate QR codes without internet. Works offline as PWA.</p>
 				</div>
 				<div class="footer-section">
-					<h4>🚀 Funciones</h4>
+					<h4 data-i18n="footer.features">🚀 Features</h4>
 					<ul>
-						<li>✨ URLs y enlaces web</li>
-						<li>📱 Contactos y WiFi</li>
-						<li>💳 Pagos y criptomonedas</li>
-						<li>📧 Email y mensajes</li>
-						<li>📍 Ubicaciones GPS</li>
-						<li>📅 Eventos y calendario</li>
-						<li>🎨 Personalización avanzada</li>
-						<li>💾 Historial y descargas</li>
+						<li data-i18n="footer.urls">✨ URLs and web links</li>
+						<li data-i18n="footer.contacts">📱 Contacts and WiFi</li>
+						<li data-i18n="footer.payments">💳 Payments and cryptocurrencies</li>
+						<li data-i18n="footer.email">📧 Email and messages</li>
+						<li data-i18n="footer.location">📍 GPS locations</li>
+						<li data-i18n="footer.events">📅 Events and calendar</li>
+						<li data-i18n="footer.customization">🎨 Advanced customization</li>
+						<li data-i18n="footer.history">💾 History and downloads</li>
 					</ul>
 				</div>
 				<div class="footer-section">
-					<h4>💝 Donaciones</h4>
-					<p>Apoya el desarrollo de esta herramienta gratuita</p>
+					<h4 data-i18n="footer.donations">💝 Donations</h4>
+					<p data-i18n="footer.support">Support the development of this free tool</p>
 					<div class="donation-buttons">
-						<button class="btn btn-small donation-btn" id="bitcoinDonation" data-crypto="bitcoin">
+						<button class="btn btn-small donation-btn" disabled>
 							<svg viewBox="0 0 24 24" fill="currentColor">
-								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
 							</svg>
-							Bitcoin
+							<span>Buy Me a Coffee (Coming Soon)</span>
 						</button>
-						<button class="btn btn-small donation-btn" id="moneroDonation" data-crypto="monero">
-							<svg viewBox="0 0 24 24" fill="currentColor">
-								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-							</svg>
-							Monero
-						</button>
-						<button class="btn btn-small donation-btn" id="ethereumDonation" data-crypto="ethereum">
-							<svg viewBox="0 0 24 24" fill="currentColor">
-								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-							</svg>
-							Ethereum
-						</button>
-										</div>
+					</div>
 				</div>
 			</div>
 			<div class="footer-bottom">
-				<p>&copy; <span id="currentYear">2024</span> QR Generator. Desarrollado por <a href="https://github.com/jmarc9909" target="_blank" rel="noopener">Juan Marcos Bravo Medina</a> para Cuba y el mundo.</p>
+				<p>&copy; <span id="currentYear">2024</span> QR Generator. Developed by <a href="https://github.com/jmarc9909" target="_blank" rel="noopener">Juan Marcos Bravo Medina</a> for Cuba and the world.</p>
 			</div>
 		</div>
 	</footer>
@@ -441,13 +576,11 @@
 				<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
 			</svg>
 		</div>
-		<p>Generando QR...</p>
+		<p data-i18n="loading">Generating QR...</p>
 	</div>
 
 	<!-- Toast Notifications -->
 	<div class="toast-container" id="toastContainer"></div>
-
-
 
 	<!-- Scripts -->
 	<script src="js/qr-types.js"></script>

@@ -225,6 +225,17 @@ body {
 	text-align: center;
 }
 
+.qr-type-actions {
+	text-align: center;
+	margin-top: var(--spacing-lg);
+}
+
+.qr-type-actions .btn {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+}
+
 .qr-type-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1228,11 +1239,34 @@ body {
 /* Customization Actions */
 .customization-actions {
 	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	gap: var(--spacing-md);
-	justify-content: center;
 	margin-top: var(--spacing-xl);
 	padding-top: var(--spacing-lg);
 	border-top: 1px solid var(--border-color);
+	flex-wrap: wrap;
+}
+
+.export-options {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+}
+
+.export-options label {
+	font-weight: 500;
+	color: var(--text-primary);
+}
+
+.export-buttons {
+	display: flex;
+	gap: var(--spacing-xs);
+}
+
+.export-buttons .btn-small {
+	padding: var(--spacing-xs) var(--spacing-sm);
+	font-size: var(--font-size-xs);
 }
 
 /* Enhanced Donation Buttons */
@@ -1262,19 +1296,226 @@ body {
 	box-shadow: var(--shadow-lg);
 }
 
-.donation-btn[data-crypto="bitcoin"] {
-	background: linear-gradient(135deg, #f7931a, #ff9500);
-	color: white;
+
+/* QR Scanner Styles */
+.qr-scanner-section {
+	margin: var(--spacing-2xl) 0;
+	text-align: center;
 }
 
-.donation-btn[data-crypto="monero"] {
-	background: linear-gradient(135deg, #ff6600, #ff8800);
-	color: white;
+/* Batch QR Generation Styles */
+.batch-qr-section {
+	margin: var(--spacing-2xl) 0;
 }
 
-.donation-btn[data-crypto="ethereum"] {
-	background: linear-gradient(135deg, #627eea, #8b9dc3);
-	color: white;
+.batch-qr-section h2 {
+	font-size: var(--font-size-2xl);
+	font-weight: 700;
+	margin-bottom: var(--spacing-lg);
+	color: var(--text-primary);
+	text-align: center;
+}
+
+.batch-container {
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: var(--radius-xl);
+	padding: var(--spacing-xl);
+	box-shadow: var(--shadow-lg);
+}
+
+.batch-input {
+	margin-bottom: var(--spacing-lg);
+}
+
+.batch-input label {
+	display: block;
+	margin-bottom: var(--spacing-sm);
+	font-weight: 500;
+	color: var(--text-primary);
+}
+
+.batch-input textarea {
+	width: 100%;
+	min-height: 200px;
+	font-family: monospace;
+}
+
+.batch-options {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: var(--spacing-lg);
+	margin-bottom: var(--spacing-lg);
+}
+
+.batch-actions {
+	display: flex;
+	justify-content: center;
+	gap: var(--spacing-md);
+	margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 480px) {
+	.batch-actions {
+		flex-direction: column;
+	}
+}
+
+.batch-results {
+	margin-top: var(--spacing-xl);
+}
+
+.batch-results h3 {
+	margin-bottom: var(--spacing-lg);
+	color: var(--text-primary);
+	text-align: center;
+}
+
+.results-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: var(--spacing-lg);
+}
+
+.result-item {
+	background: var(--bg-secondary);
+	border: 1px solid var(--border-color);
+	border-radius: var(--radius-lg);
+	padding: var(--spacing-md);
+	text-align: center;
+}
+
+.result-item img {
+	max-width: 100%;
+	height: auto;
+	border-radius: var(--radius-md);
+	margin-bottom: var(--spacing-sm);
+}
+
+.result-item .result-data {
+	font-size: var(--font-size-sm);
+	word-break: break-all;
+	margin-bottom: var(--spacing-sm);
+}
+
+.result-item .result-actions {
+	display: flex;
+	justify-content: center;
+	gap: var(--spacing-sm);
+}
+
+.qr-scanner-section h2 {
+	font-size: var(--font-size-2xl);
+	font-weight: 700;
+	margin-bottom: var(--spacing-lg);
+	color: var(--text-primary);
+}
+
+.scanner-container {
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: var(--radius-xl);
+	padding: var(--spacing-xl);
+	box-shadow: var(--shadow-lg);
+}
+
+.scanner-preview {
+	position: relative;
+	margin: 0 auto var(--spacing-lg);
+	max-width: 500px;
+}
+
+.scanner-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: var(--text-inverse);
+	background: rgba(0, 0, 0, 0.3);
+}
+
+.scanner-frame {
+	width: 200px;
+	height: 200px;
+	border: 3px solid var(--primary-color);
+	border-radius: var(--radius-md);
+	margin-bottom: var(--spacing-md);
+	animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+	0% {
+		border-color: var(--primary-color);
+		box-shadow: 0 0 5px var(--primary-color);
+	}
+	50% {
+		border-color: var(--accent-color);
+		box-shadow: 0 0 20px var(--accent-color);
+	}
+	100% {
+		border-color: var(--primary-color);
+		box-shadow: 0 0 5px var(--primary-color);
+	}
+}
+
+.scanner-overlay p {
+	font-size: var(--font-size-lg);
+	font-weight: 500;
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.scanner-controls {
+	display: flex;
+	justify-content: center;
+	gap: var(--spacing-md);
+	margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 480px) {
+	.scanner-controls {
+		flex-direction: column;
+	}
+}
+
+.scanner-result {
+	background: var(--bg-secondary);
+	border-radius: var(--radius-lg);
+	padding: var(--spacing-lg);
+	margin-top: var(--spacing-lg);
+}
+
+.scanner-result h3 {
+	margin-bottom: var(--spacing-md);
+	color: var(--text-primary);
+}
+
+.result-content {
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: var(--radius-md);
+	padding: var(--spacing-md);
+	margin-bottom: var(--spacing-md);
+	word-break: break-all;
+	text-align: left;
+	font-family: monospace;
+	min-height: 60px;
+}
+
+.result-actions {
+	display: flex;
+	justify-content: center;
+	gap: var(--spacing-md);
+}
+
+@media (max-width: 480px) {
+	.result-actions {
+		flex-direction: column;
+	}
 }
 
 
@@ -1331,6 +1572,15 @@ body {
 	
 	.customization-actions {
 		flex-direction: column;
+	}
+	
+	.export-options {
+		width: 100%;
+		justify-content: center;
+	}
+	
+	.export-buttons {
+		justify-content: center;
 	}
 	
 	.donation-buttons {
