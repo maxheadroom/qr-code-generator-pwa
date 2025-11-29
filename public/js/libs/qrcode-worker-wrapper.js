@@ -18,10 +18,13 @@
         // In a worker, we only support string elements (the text to encode)
         if (typeof element === 'string') {
             // Create a QRCode instance without a DOM element
-            this._qrCode = new OriginalQRCode(null, options);
+            this._qrCode = new OriginalQRCode(options);
             this._qrCode.makeCode(element);
+        } else if (typeof element === 'object' && element !== null) {
+            // If element is an options object
+            this._qrCode = new OriginalQRCode(element);
         } else {
-            this._qrCode = new OriginalQRCode(element, options);
+            this._qrCode = new OriginalQRCode(null, options);
         }
     };
     
@@ -47,7 +50,7 @@
     QRCodeWorkerWrapper.generateQRData = function(text, options) {
         try {
             // Create QR code instance
-            var qrCode = new OriginalQRCode(null, options);
+            var qrCode = new OriginalQRCode(options);
             qrCode.makeCode(text);
             
             // Return the raw QR data

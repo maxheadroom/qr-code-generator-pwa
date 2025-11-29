@@ -623,89 +623,99 @@ class QRGeneratorApp {
 	}
 
 	async createQRCode(data, options) {
-		// Check if Web Workers are supported and we're not on file:// protocol
-		if (typeof Worker !== 'undefined' && window.location.protocol !== 'file:') {
-			return new Promise((resolve, reject) => {
-				try {
-					// Create Web Worker
-					const worker = new Worker('js/qr-worker.js');
-					
-					// Send data to worker
-					worker.postMessage({ data, options });
-					
-					// Listen for response from worker
-					worker.onmessage = (e) => {
-						const result = e.data;
-						worker.terminate(); // Clean up worker
-						
-						if (result.success) {
-							// Generate the actual image from the QR data in the main thread
-							const imageDataURL = this.generateQRImageFromData(result.qrData);
-							resolve(imageDataURL);
-						} else {
-							reject(new Error(result.error));
-						}
-					};
-					
-					// Handle worker errors
-					worker.onerror = (error) => {
-						worker.terminate();
-						reject(new Error(`Worker error: ${error.message || 'Unknown error'}`));
-					};
-					
-					// Set timeout for worker
-					setTimeout(() => {
-						worker.terminate();
-						reject(new Error('QR generation timeout'));
-					}, 10000); // 10 second timeout
-				} catch (error) {
-					console.error('Error creating Web Worker:', error);
-					// Fallback to original method
-					return this.createQRCodeFallback(data, options);
-				}
-			});
-		} else {
-			// Fallback for browsers that don't support Web Workers or when on file:// protocol
-			return this.createQRCodeFallback(data, options);
-		}
-	}
+        // Check if Web Workers are supported and we're not on file:// protocol
+        if (typeof Worker !== 'undefined' && window.location.protocol !== 'file:') {
+            return new Promise((resolve, reject) => {
+                try {
+                    // Create Web Worker
+                    const worker = new Worker('js/qr-worker.js');
+                    
+                    // Send data to worker
+                    worker.postMessage({ data, options });
+                    
+                    // Listen for response from worker
+                    worker.onmessage = (e) => {
+                        const result = e.data;
+                        worker.terminate(); // Clean up worker
+                        
+                        if (result.success) {
+                            // Generate the actual image from the QR data in the main thread
+                            const imageDataURL = this.generateQRImageFromData(result);
+                            resolve(imageDataURL);
+                        } else {
+                            console.warn('Web Worker failed, falling back to main thread:', result.error);
+                            // Fallback to original method
+                            this.createQRCodeFallback(data, options).then(resolve).catch(reject);
+                        }
+                    };
+                    
+                    // Handle worker errors
+                    worker.onerror = (error) => {
+                        worker.terminate();
+                        console.warn('Web Worker error, falling back to main thread:', error);
+                        // Fallback to original method
+                        this.createQRCodeFallback(data, options).then(resolve).catch(reject);
+                    };
+                    
+                    // Set timeout for worker
+                    setTimeout(() => {
+                        worker.terminate();
+                        console.warn('Web Worker timeout, falling back to main thread');
+                        // Fallback to original method
+                        this.createQRCodeFallback(data, options).then(resolve).catch(reject);
+                    }, 10000); // 10 second timeout
+                } catch (error) {
+                    console.warn('Error creating Web Worker, falling back to main thread:', error);
+                    // Fallback to original method
+                    this.createQRCodeFallback(data, options).then(resolve).catch(reject);
+                }
+            });
+        } else {
+            // Fallback for browsers that don't support Web Workers or when on file:// protocol
+            return this.createQRCodeFallback(data, options);
+        }
+    }
 	
 	// Generate QR image from data (used when Web Worker returns QR data)
-	generateQRImageFromData(qrData) {
-		// Create canvas
-		const canvas = document.createElement('canvas');
-		const ctx = canvas.getContext('2d');
-		
-		// Set canvas size
-		const size = qrData.options.width || 256;
-		canvas.width = size;
-		canvas.height = size;
-		
-		// Get QR module count
-		const moduleCount = qrData.qrData.getModuleCount();
-		const cellSize = Math.floor(size / moduleCount);
-		const margin = qrData.options.margin || 4;
-		
-		// Fill background
-		ctx.fillStyle = qrData.options.color?.light || '#FFFFFF';
-		ctx.fillRect(0, 0, size, size);
-		
-		// Draw QR code
-		ctx.fillStyle = qrData.options.color?.dark || '#000000';
-		
-		for (let row = 0; row < moduleCount; row++) {
-			for (let col = 0; col < moduleCount; col++) {
-				if (qrData.qrData.isDark(row, col)) {
-					const x = margin + col * cellSize;
-					const y = margin + row * cellSize;
-					ctx.fillRect(x, y, cellSize, cellSize);
-				}
-			}
-		}
-		
-		// Convert to data URL
-		return canvas.toDataURL('image/png');
-	}
+    generateQRImageFromData(result) {
+        // Handle both the old format (just qrData) and new format (full result object)
+        const qrData = result.qrData || result;
+        const options = result.options || {};
+        
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        const size = options.width || 256;
+        canvas.width = size;
+        canvas.height = size;
+        
+        // Get QR module count
+        const moduleCount = qrData.getModuleCount();
+        const cellSize = Math.floor(size / moduleCount);
+        const margin = options.margin || 4;
+        
+        // Fill background
+        ctx.fillStyle = options.color?.light || '#FFFFFF';
+        ctx.fillRect(0, 0, size, size);
+        
+        // Draw QR code
+        ctx.fillStyle = options.color?.dark || '#000000';
+        
+        for (let row = 0; row < moduleCount; row++) {
+            for (let col = 0; col < moduleCount; col++) {
+                if (qrData.isDark(row, col)) {
+                    const x = margin + col * cellSize;
+                    const y = margin + row * cellSize;
+                    ctx.fillRect(x, y, cellSize, cellSize);
+                }
+            }
+        }
+        
+        // Convert to data URL
+        return canvas.toDataURL('image/png');
+    }
 	
 	// Fallback method for QR code generation
 	async createQRCodeFallback(data, options) {

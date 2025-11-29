@@ -81,12 +81,143 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+	<!-- Critical CSS loaded immediately to prevent FOUC -->
+	<style>
+		/* Minimal critical styles to prevent flash of unstyled content */
+		body {
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			line-height: 1.6;
+			margin: 0;
+			padding: 0;
+			background-color: #f8fafc;
+			color: #1e293b;
+			transition: background-color 0.3s, color 0.3s;
+		}
+		
+		.dark-mode {
+			background-color: #0f172a;
+			color: #e2e8f0;
+		}
+		
+		.header {
+			background: white;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+			padding: 1rem 0;
+		}
+		
+		.dark-mode .header {
+			background: #1e293b;
+		}
+		
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 1rem;
+		}
+		
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.5rem 1rem;
+			border-radius: 0.375rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s;
+			border: none;
+		}
+		
+		.btn:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+		}
+		
+		.btn-primary {
+			background-color: #2563eb;
+			color: white;
+		}
+		
+		.btn-secondary {
+			background-color: #64748b;
+			color: white;
+		}
+		
+		.form-control {
+			width: 100%;
+			padding: 0.5rem;
+			border: 1px solid #cbd5e1;
+			border-radius: 0.375rem;
+			background: white;
+		}
+		
+		.dark-mode .form-control {
+			background: #1e293b;
+			border-color: #334155;
+			color: #e2e8f0;
+		}
+		
+		.loading {
+			display: none;
+			text-align: center;
+			padding: 2rem;
+		}
+		
+		.spinner {
+			width: 2rem;
+			height: 2rem;
+			border: 2px solid rgba(37, 99, 235, 0.2);
+			border-top: 2px solid #2563eb;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin: 0 auto 1rem;
+		}
+		
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+		
+		.toast {
+			position: fixed;
+			top: 1rem;
+			right: 1rem;
+			padding: 1rem;
+			border-radius: 0.375rem;
+			color: white;
+			z-index: 1000;
+			transform: translateX(100%);
+			transition: transform 0.3s ease-out;
+			min-width: 250px;
+			box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+		}
+		
+		.toast.show {
+			transform: translateX(0);
+		}
+		
+		.toast-success {
+			background-color: #10b981;
+		}
+		
+		.toast-error {
+			background-color: #ef4444;
+		}
+		
+		.toast-warning {
+			background-color: #f59e0b;
+		}
+		
+		.toast-info {
+			background-color: #3b82f6;
+		}
+	</style>
+	
 	<!-- Preload critical resources -->
 	<link rel="preload" href="css/style.min.css" as="style">
 	<link rel="preload" href="js/app.js" as="script">
 	<link rel="preload" href="js/libs/qrcode.min.js" as="script">
-
-	<!-- Styles -->
+	
+	<!-- Load main stylesheet -->
 	<link rel="stylesheet" href="css/style.min.css">
 	
 	<!-- External Libraries -->
@@ -94,7 +225,7 @@
 	<script src="js/libs/qrcode-wrapper.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 	
-		<!-- QR Library Load Check -->
+	<!-- QR Library Load Check -->
 	<script>
 		window.addEventListener('load', function() {
 			if (typeof QRCode !== 'undefined') {
@@ -407,7 +538,7 @@
 						<div class="customization-group">
 							<label for="qrMargin" data-i18n="advanced.margin">
 								<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-									<path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+									<path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5m11 5l-5-5m5 5v-4m0 4h-4"/>
 								</svg>
 								<span data-i18n="advanced.margin">Margin</span>
 							</label>

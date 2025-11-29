@@ -3,7 +3,12 @@
 // Try to import the required libraries
 let librariesLoaded = false;
 try {
-    self.importScripts('libs/qrcode.min.js', 'libs/qrcode-worker-wrapper.js');
+    // Import the worker-compatible QR code library
+    self.importScripts('libs/qrcode-worker-compatible.js');
+    
+    // Then import our worker wrapper which is designed for Web Workers
+    self.importScripts('libs/qrcode-worker-wrapper.js');
+    
     librariesLoaded = true;
 } catch (error) {
     console.error('Failed to load QR code libraries in worker:', error);
