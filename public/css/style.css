@@ -683,9 +683,19 @@ body {
 	list-style: none;
 }
 
-.donation-buttons {
-	display: flex;
-	gap: var(--spacing-sm);
+.footer-section ul li {
+	margin-bottom: var(--spacing-xs);
+}
+
+.footer-section a {
+	color: var(--text-secondary);
+	text-decoration: none;
+	transition: color 0.2s;
+}
+
+.footer-section a:hover {
+	color: var(--primary-color);
+	text-decoration: underline;
 }
 
 .footer-bottom {
