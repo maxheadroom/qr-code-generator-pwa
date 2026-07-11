@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "start": "npx serve public",
-    "lint": "eslint public/js/*.js"
+    "lint": "eslint public/js/*.js",
+    "test": "echo 'No automated tests yet. Contributions welcome!'"
   },
   "keywords": ["qr", "pwa", "offline", "generator"],
   "author": "QR Generator Team",
