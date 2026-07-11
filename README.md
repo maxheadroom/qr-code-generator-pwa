@@ -1,238 +1,124 @@
 # QR Generator Offline
 
-Generador de códigos QR offline que funciona como Progressive Web App (PWA). Crea QR para URLs, contactos, WiFi, pagos y más sin necesidad de conexión a internet.
+**Offline QR Code Generator** — A fully featured Progressive Web App that creates QR codes for URLs, contacts, WiFi, payments, and more. Works entirely without an internet connection.
 
-## ✅ Mejoras Recientes (v1.0.1)
-
-- 🔒 **Seguridad mejorada**: SRI en scripts externos, sanitización de inputs
-- ⚡ **Rendimiento optimizado**: CSS/JS minificado, lazy loading
-- 🎨 **UX mejorada**: Validación de formularios, tooltips, accesibilidad
-- 🛠️ **Calidad de código**: ESLint configurado, estructura modular
-- 📱 **PWA mejorado**: Cache versioning, iconos optimizados
-=======
-# QR Generator Offline
-
-Generador de códigos QR offline que funciona como Progressive Web App (PWA). Crea QR para URLs, contactos, WiFi, pagos y más sin necesidad de conexión a internet.
-
-## 🚀 Características
-
-### Tipos de QR Soportados
-- **URLs**: Enlaces a páginas web
-- **Texto**: Texto libre personalizado
-- **Email**: Direcciones de correo con asunto y cuerpo
-- **WiFi**: Configuración de redes WiFi (WPA/WPA2/WEP)
-- **Contactos**: Información de contacto (vCard)
-- **Bitcoin**: Direcciones de wallet Bitcoin
-- **PayPal**: Enlaces de pago PayPal
-- **Ubicación**: Coordenadas GPS
-- **Eventos**: Eventos de calendario
-- **Redes Sociales**: Instagram, Facebook, YouTube, etc.
-
-### Funcionalidades PWA
-- ✅ **Funciona offline** - Sin necesidad de internet
-- ✅ **Instalable** - Se puede instalar como app nativa
-- ✅ **Responsive** - Diseño adaptativo para móviles
-- ✅ **Tema oscuro/claro** - Interfaz personalizable
-- ✅ **Historial** - Guarda QR generados
-- ✅ **Descarga** - Guarda QR en diferentes formatos
-- ✅ **Compartir** - Comparte QR directamente
-- ✅ **Personalización** - Colores, tamaño, corrección de errores
-
-### Tecnologías
-- **Frontend**: HTML5, CSS3, JavaScript ES6+
-- **PWA**: Service Worker, Manifest, Cache API
-- **Librerías**: QRCode.js, FileSaver.js
-- **Hosting**: GitHub Pages (estático)
-
-## 📱 Instalación
-
-### Opción 1: Usar Online
-1. Ve a [https://tu-usuario.github.io/qr-generator](https://tu-usuario.github.io/qr-generator)
-2. Haz clic en "Instalar" cuando aparezca el prompt
-3. ¡Listo! La app se instalará en tu dispositivo
-
-### Opción 2: Desarrollo Local
-```bash
-# Clonar el repositorio
-git clone https://github.com/tu-usuario/qr-generator.git
-cd qr-generator
-
-# Servir archivos localmente (necesario para PWA)
-python -m http.server 8000
-# o
-npx serve .
-
-# Abrir en navegador
-open http://localhost:8000
-```
-
-## 🎯 Uso
-
-### Generar un QR Básico
-1. Selecciona el tipo de QR (URL, texto, WiFi, etc.)
-2. Completa los campos requeridos
-3. Personaliza el diseño (opcional)
-4. Haz clic en "Generar QR"
-5. Descarga o comparte el QR
-
-### Personalización Avanzada
-- **Tamaño**: 128x128 hasta 1024x1024 píxeles
-- **Corrección de errores**: L (7%), M (15%), Q (25%), H (30%)
-- **Colores**: Personaliza colores de frente y fondo
-- **Margen**: Ajusta el espacio alrededor del QR
-- **Logo**: Añade un logo central (opcional)
-
-### Funciones Offline
-- ✅ Generar QR sin internet
-- ✅ Ver historial de QR generados
-- ✅ Personalizar diseño
-- ✅ Descargar QR guardados
-
-## 💰 Monetización
-
-### Cuba (Mercado Local)
-- **Donaciones MLC**: Integración con tiendas en línea cubanas
-- **Servicios premium**: QR personalizados con logo
-
-### Mercado Internacional
-- **Google AdSense**: Publicidad contextual
-- **Donaciones Bitcoin**: Lightning Network para transacciones rápidas
-
-## 📊 Marketing Digital
-
-### Estrategia de Contenido
-1. **Facebook/Instagram**: Videos cortos mostrando casos de uso
-2. **Twitter**: Hilos educativos sobre QR
-3. **LinkedIn**: Contenido profesional sobre digitalización
-4. **TikTok**: Retos virales y contenido rápido
-5. **YouTube**: Tutoriales completos
-
-### Contenido Sugerido
-- "5 usos creativos para QR que no conocías"
-- "Cómo los QR están ayudando a negocios cubanos"
-- "Genera tu QR en 10 segundos"
-- "Cómo crear códigos QR sin internet"
-
-## 🛠️ Desarrollo
-
-### Estructura del Proyecto
-```
-qr-generator/
-├── index.html          # Página principal
-├── manifest.json       # Configuración PWA
-├── sw.js              # Service Worker
-├── css/
-│   └── style.css      # Estilos
-├── js/
-│   ├── app.js         # Lógica principal
-│   ├── qr-types.js    # Tipos de QR
-│   └── pwa.js         # Funcionalidades PWA
-└── assets/
-    └── icons/         # Iconos PWA
-```
-
-### Agregar Nuevos Tipos de QR
-1. Edita `js/qr-types.js`
-2. Añade el nuevo tipo al objeto `QR_TYPES`
-3. Define campos, validación y función de generación
-4. Actualiza las categorías si es necesario
-
-### Personalizar Estilos
-- Edita `css/style.css`
-- Usa variables CSS para colores y espaciado
-- Soporte para tema oscuro/claro incluido
-
-## 📈 Métricas de Éxito
-
-- **Tiempo de carga**: < 3 segundos
-- **Puntuación Lighthouse**: > 90
-- **Compatibilidad**: 95% de navegadores
-- **Tamaño**: < 500KB total
-
-## 🔧 Configuración
-
-### Variables de Entorno
-```javascript
-// En js/app.js
-const CONFIG = {
-    APP_NAME: 'QR Generator',
-    VERSION: '1.0.0',
-    DONATION_ADDRESS: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
-    ANALYTICS_ID: 'GA_TRACKING_ID'
-};
-```
-
-### Personalización de Colores
-```css
-/* En css/style.css */
-:root {
-    --primary-color: #2563eb;
-    --secondary-color: #64748b;
-    --accent-color: #f59e0b;
-    /* ... más variables */
-}
-```
-
-## 🚀 Despliegue
-
-### GitHub Pages
-1. Sube el código a GitHub
-2. Ve a Settings > Pages
-3. Selecciona la rama main
-4. La app estará disponible en `https://tu-usuario.github.io/qr-generator`
-
-### Netlify
-1. Conecta tu repositorio a Netlify
-2. Configura el directorio de build como `/`
-3. Despliega automáticamente
-
-### Vercel
-1. Importa el proyecto en Vercel
-2. Configura como proyecto estático
-3. Despliega con un clic
-
-## 📱 Compatibilidad
-
-### Navegadores Soportados
-- ✅ Chrome 70+
-- ✅ Firefox 65+
-- ✅ Safari 12+
-- ✅ Edge 79+
-- ✅ Opera 57+
-
-### Dispositivos
-- ✅ Android 5.0+
-- ✅ iOS 12+
-- ✅ Windows 10+
-- ✅ macOS 10.14+
-- ✅ Linux (Chrome/Firefox)
-
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
-## 🙏 Agradecimientos
-
-- [QRCode.js](https://github.com/davidshimjs/qrcodejs) - Librería de generación QR
-- [FileSaver.js](https://github.com/eligrey/FileSaver.js) - Descarga de archivos
-- [MDN Web Docs](https://developer.mozilla.org/) - Documentación PWA
-- Comunidad de desarrolladores cubanos
-
-## 📞 Contacto
-
-- **Email**: contacto@qr-generator.com
-- **Twitter**: [@qrgenerator](https://twitter.com/qrgenerator)
-- **GitHub**: [qr-generator](https://github.com/qr-generator)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue)
+![PWA](https://img.shields.io/badge/PWA-ready-green)
+![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 ---
 
-**Hecho con ❤️ para Cuba y el mundo**
->>>>>>> 8c7691c1511e6578bab622b133be6010a34003f9
+## Features
+
+- **15 QR types**: URL, Text, Email, SMS, WhatsApp, Telegram, Call, WiFi, Contact (vCard), Location, Calendar, Bitcoin, Ethereum, PayPal
+- **Fully offline**: Service Worker caches all assets. Works without internet after first visit.
+- **Installable PWA**: Add to home screen on mobile and desktop.
+- **QR Scanner**: Decode QR codes using your device camera (via jsQR).
+- **Batch generation**: Create multiple QR codes at once, download as ZIP.
+- **Customization**: Foreground/background colors, gradient support, error correction level, margin, dot styles, center logo overlay.
+- **Export**: Download as PNG, SVG, or PDF.
+- **History**: Stores last 20 generated QR codes in localStorage.
+- **Dark/Light theme**: Toggle with persistent preference.
+- **i18n**: English, Spanish, Portuguese, French.
+- **Privacy-first**: No data sent to servers. No analytics. No tracking. Everything runs client-side.
+- **Keyboard accessible**: ARIA labels, semantic HTML, full keyboard navigation.
+
+## Quick Start
+
+```bash
+git clone https://github.com/jmarc9901/qr-code-generator-pwa.git
+cd qr-code-generator-pwa
+npx serve public
+```
+
+Open `http://localhost:3000` in your browser.
+
+> **Note**: PWA features (Service Worker) require serving via HTTP(S). The `file://` protocol won't register the Service Worker.
+
+## Project Structure
+
+```
+public/
+├── index.html                  # Application entry point
+├── manifest.json               # PWA manifest
+├── sw.js                       # Service Worker (offline caching)
+├── sitemap.xml                 # SEO sitemap
+├── css/
+│   ├── style.css               # Stylesheet
+│   └── style.min.css           # Minified stylesheet
+├── js/
+│   ├── app.js                  # Main application logic
+│   ├── qr-types.js             # QR type definitions (15 types)
+│   ├── pwa.js                  # PWA lifecycle management
+│   ├── qr-worker.js            # Web Worker for QR generation
+│   ├── utils.js                # Utility functions
+│   ├── validation.js           # Form validation
+│   └── langs/                  # Translation files (en, es, pt, fr)
+├── libs/                       # Vendored third-party libraries
+│   ├── qrcode.min.js           # QRCode.js
+│   ├── qrcode-wrapper.js       # toDataURL wrapper for QRCode.js
+│   ├── qrcode-worker-compatible.js  # Worker-compatible QRCode.js
+│   ├── qrcode-worker-wrapper.js     # Worker wrapper
+│   ├── FileSaver.min.js        # File download library
+│   └── jsQR.min.js             # QR decoding library
+└── assets/
+    ├── img/logo.png            # Application logo
+    └── icons/                  # PWA icons (16px to 512px)
+```
+
+## Supported QR Types
+
+| Type | ID | Format |
+|------|----|--------|
+| URL | `url` | Direct URL |
+| Text | `text` | Free text |
+| Email | `email` | `mailto:` with subject and body |
+| SMS | `sms` | `sms:` with phone and message |
+| WhatsApp | `whatsapp` | `https://wa.me/` |
+| Telegram | `telegram` | `https://t.me/` |
+| Call | `call` | `tel:` |
+| WiFi | `wifi` | `WIFI:S:...;T:...;P:...;` |
+| Contact | `vcard` | vCard 3.0 format |
+| Location | `location` | `geo:` coordinates |
+| Calendar | `calendar` | iCalendar `VEVENT` |
+| Bitcoin | `bitcoin` | BIP-21 URI |
+| Ethereum | `ethereum` | EIP-681 URI |
+| PayPal | `paypal` | PayPal donation link |
+
+## Development
+
+```bash
+npm install
+npm run lint        # Run ESLint
+npx serve public    # Start local server
+```
+
+### Adding a new QR type
+
+1. Add the type definition to `public/js/qr-types.js` (fields, generator function).
+2. Add translation keys to all 4 language files in `public/js/langs/`.
+3. Add a shortcut in `public/manifest.json` (optional).
+
+## Deployment
+
+Deploy the `public/` directory to any static hosting:
+
+- **GitHub Pages**: Push to `main`, the included CI workflow deploys automatically.
+- **Netlify**: Connect repo, set publish directory to `public`.
+- **Vercel**: Import project, set output directory to `public`.
+
+## Tech Stack
+
+- **HTML5** · **CSS3** (Custom Properties, Dark Mode)
+- **JavaScript ES6+** (vanilla, no frameworks)
+- **PWA** (Service Worker, Cache API, Manifest)
+- **Web Worker** (off-thread QR generation)
+- **QRCode.js** · **jsQR** · **FileSaver.js** · **JSZip** · **jsPDF**
+
+## License
+
+[MIT](LICENSE)
+
+## Author
+
+**Juan Marcos Bravo Medina** — [GitHub](https://github.com/jmarc9909)

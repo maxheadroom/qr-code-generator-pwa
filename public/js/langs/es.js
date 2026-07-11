@@ -171,5 +171,14 @@ export default {
     'qr.error': 'Error al generar QR: {error}',
     'qr.dataError': 'No se pudieron generar los datos del QR',
     'copy.success': 'Copiado al portapapeles',
-    'copy.error': 'Error al copiar al portapapeles'
+    'copy.error': 'Error al copiar al portapapeles',
+    'validation.error': 'Error en la validación del formulario',
+    'qr.errorLibrary': 'Librería QR no cargada. Intentando cargar...',
+    'qr.errorLoad': 'No se pudo cargar la librería QR. Verifica tu conexión.',
+    'qr.shareText': 'QR generado',
+    'qr.shareError': 'Error al compartir QR',
+    'upload.invalidType': 'Por favor selecciona un archivo de imagen válido',
+    'upload.tooLarge': 'El archivo es demasiado grande. Máximo 2MB',
+    'customize.reset': 'Personalización restablecida',
+    'customize.applied': 'Cambios aplicados'
 };

@@ -233,7 +233,6 @@ const QR_TYPES = {
 			if (data.hidden === 'true') {
 				wifi += 'H:true;';
 			}
-			wifi += ';';
 			return wifi;
 		}
 	},
@@ -291,14 +290,15 @@ const QR_TYPES = {
 			}
 		],
 		generate: (data) => {
-			let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
-			vcard += `FN:${data.firstName} ${data.lastName}\n`;
-			vcard += `N:${data.lastName};${data.firstName};;;\n`;
-			if (data.phone) vcard += `TEL:${data.phone}\n`;
-			if (data.email) vcard += `EMAIL:${data.email}\n`;
-			if (data.company) vcard += `ORG:${data.company}\n`;
-			if (data.title) vcard += `TITLE:${data.title}\n`;
-			if (data.website) vcard += `URL:${data.website}\n`;
+			const esc = (s) => (s || '').replace(/[\\;,]/g, '\\$&').replace(/\n/g, '\\n');
+			let vcard = 'BEGIN:VCARD\r\nVERSION:3.0\r\n';
+			vcard += `FN:${esc(data.firstName)} ${esc(data.lastName)}\r\n`;
+			vcard += `N:${esc(data.lastName)};${esc(data.firstName)};;;\r\n`;
+			if (data.phone) vcard += `TEL:${esc(data.phone)}\r\n`;
+			if (data.email) vcard += `EMAIL:${data.email}\r\n`;
+			if (data.company) vcard += `ORG:${esc(data.company)}\r\n`;
+			if (data.title) vcard += `TITLE:${esc(data.title)}\r\n`;
+			if (data.website) vcard += `URL:${data.website}\r\n`;
 			vcard += 'END:VCARD';
 			return vcard;
 		}
@@ -384,8 +384,7 @@ const QR_TYPES = {
 		],
 		generate: (data) => {
 			const formatDate = (dateStr) => {
-				const date = new Date(dateStr);
-				return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+				return dateStr.replace(/[-:]/g, '').replace('T', 'T');
 			};
 
 			let ics = 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\n';
@@ -514,12 +513,10 @@ const QR_TYPES = {
 			}
 		],
 		generate: (data) => {
-			let paypal = `https://www.paypal.com/paypalme/${data.email}`;
-			const params = [];
-			if (data.amount) params.push(`amount=${data.amount}`);
-			if (data.currency) params.push(`currency=${data.currency}`);
-			if (data.description) params.push(`description=${encodeURIComponent(data.description)}`);
-			if (params.length > 0) paypal += '?' + params.join('&');
+			let paypal = `https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=${encodeURIComponent(data.email)}`;
+			if (data.amount) paypal += `&amount=${data.amount}`;
+			if (data.currency) paypal += `&currency_code=${data.currency}`;
+			if (data.description) paypal += `&item_name=${encodeURIComponent(data.description)}`;
 			return paypal;
 		}
 	}

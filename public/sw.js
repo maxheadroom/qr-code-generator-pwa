@@ -17,7 +17,14 @@ const STATIC_FILES = [
 	'/js/libs/qrcode.min.js',
 	'/js/libs/qrcode-wrapper.js',
 	'/js/libs/qrcode-worker-wrapper.js',
-	'/manifest.json'
+	'/manifest.json',
+	'/css/style.min.css',
+	'/assets/icons/icon-192x192.png',
+	'/assets/icons/icon-512x512.png',
+	'/js/utils.js',
+	'/js/validation.js',
+	'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+	'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 
 // Install event
@@ -117,8 +124,8 @@ self.addEventListener('push', (event) => {
 	
 	const options = {
 		body: event.data ? event.data.text() : 'New notification from QR Generator',
-		icon: '/assets/icons/android-chrome-192x192.png',
-		badge: '/assets/icons/favicon-32x32.png',
+		icon: '/assets/icons/icon-192x192.png',
+		badge: '/assets/icons/icon-32x32.png',
 		vibrate: [100, 50, 100],
 		data: {
 			dateOfArrival: Date.now(),
@@ -128,12 +135,12 @@ self.addEventListener('push', (event) => {
 			{
 				action: 'explore',
 				title: 'Open app',
-				icon: '/assets/icons/favicon-32x32.png'
+				icon: '/assets/icons/icon-32x32.png'
 			},
 			{
 				action: 'close',
 				title: 'Close',
-				icon: '/assets/icons/favicon-32x32.png'
+				icon: '/assets/icons/icon-32x32.png'
 			}
 		]
 	};

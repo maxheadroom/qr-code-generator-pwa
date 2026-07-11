@@ -1,3 +1,5 @@
+/* global QR_TYPES */
+
 // Main Application Logic
 class QRGeneratorApp {
 	constructor() {
@@ -9,8 +11,8 @@ class QRGeneratorApp {
 		this.translations = {};
 		
 		// Import utility functions
-		this.utils = null;
-		this.validation = null;
+		this.utils = window.QRUtils || null;
+		this.validation = window.QRValidation || null;
 		
 		this.init();
 	}
@@ -477,7 +479,7 @@ class QRGeneratorApp {
 		// Fallback to original validation
 		try {
 			if (!this.currentQRType) {
-				this.showToast('error', 'Selecciona un tipo de QR primero');
+				this.showToast('error', this.t('validation.selectType'));
 				return false;
 			}
 
@@ -488,7 +490,7 @@ class QRGeneratorApp {
 
 				// Check required fields
 				if (field.required && (!value || value.trim() === '')) {
-					this.showToast('error', `El campo "${field.label}" es requerido`);
+					this.showToast('error', this.t('validation.required', { field: field.label }));
 					return false;
 				}
 
@@ -500,7 +502,7 @@ class QRGeneratorApp {
 
 			return true;
 		} catch (error) {
-			this.showToast('error', 'Error en la validación del formulario');
+			this.showToast('error', this.t('validation.error'));
 			return false;
 		}
 	}
@@ -519,13 +521,14 @@ class QRGeneratorApp {
 		
 		// Fallback to original validation
 		switch (field.type) {
-			case 'email':
+			case 'email': {
 				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 				if (!emailRegex.test(value)) {
 					this.showToast('error', this.t('validation.email', { field: field.label }));
 					return false;
 				}
 				break;
+			}
 			case 'url':
 				try {
 					new URL(value);
@@ -534,13 +537,14 @@ class QRGeneratorApp {
 					return false;
 				}
 				break;
-			case 'tel':
-				const phoneRegex = /^[\+]?[0-9\s\-\(\)]{7,}$/;
+			case 'tel': {
+				const phoneRegex = /^[+]?[0-9\s\-()]{7,}$/;
 				if (!phoneRegex.test(value)) {
 					this.showToast('error', this.t('validation.phone', { field: field.label }));
 					return false;
 				}
 				break;
+			}
 			case 'number':
 				if (isNaN(value) || value < (field.min || 0)) {
 					this.showToast('error', this.t('validation.number', { field: field.label }));
@@ -560,13 +564,12 @@ class QRGeneratorApp {
 		// Check if QRCode library is available
 		if (typeof QRCode === 'undefined') {
 			console.error('QRCode library not available');
-			this.showToast('error', 'Error: Librería QR no cargada. Intentando cargar...');
+			this.showToast('error', this.t('qr.errorLibrary'));
 
-			// Intentar cargar la librería dinámicamente
 			await this.loadQRCodeLibrary();
 
 			if (typeof QRCode === 'undefined') {
-				this.showToast('error', 'Error: No se pudo cargar la librería QR. Verifica tu conexión a internet.');
+				this.showToast('error', this.t('qr.errorLoad'));
 				return;
 			}
 		}
@@ -768,7 +771,7 @@ class QRGeneratorApp {
 				}
 
 				// Validate data
-				if (!data || data.trim === '') {
+				if (!data || data.trim() === '') {
 					reject(new Error('No data provided for QR code'));
 					return;
 				}
@@ -903,12 +906,12 @@ class QRGeneratorApp {
 
 				await navigator.share({
 					title: 'QR Code',
-					text: `QR generado: ${this.currentQRType.name}`,
+					text: `${this.t('qr.shareText')}: ${this.currentQRType.name}`,
 					files: [file]
 				});
 			} catch (error) {
 				console.error('Error sharing:', error);
-				this.showToast('error', 'Error al compartir');
+				this.showToast('error', this.t('qr.shareError'));
 			}
 		} else {
 			this.copyToClipboard(this.generatedQR.data);
@@ -918,10 +921,10 @@ class QRGeneratorApp {
 	async copyToClipboard(text) {
 		try {
 			await navigator.clipboard.writeText(text);
-			this.showToast('success', 'Copiado al portapapeles');
+			this.showToast('success', this.t('copy.success'));
 		} catch (error) {
 			console.error('Error copying to clipboard:', error);
-			this.showToast('error', 'Error al copiar');
+			this.showToast('error', this.t('copy.error'));
 		}
 	}
 
@@ -999,8 +1002,9 @@ class QRGeneratorApp {
 					</svg>
 				</button>
 			</div>
-			<div class="toast-message">${message}</div>
+			<div class="toast-message"></div>
 		`;
+		toast.querySelector('.toast-message').textContent = message;
 
 		container.appendChild(toast);
 
@@ -1172,7 +1176,6 @@ class QRGeneratorApp {
 		const fileUploadArea = document.getElementById('fileUploadArea');
 		const logoUpload = document.getElementById('logoUpload');
 		const logoPreview = document.getElementById('logoPreview');
-		const logoImage = document.getElementById('logoImage');
 		const removeLogo = document.getElementById('removeLogo');
 
 		// Drag and drop
@@ -1212,12 +1215,12 @@ class QRGeneratorApp {
 	// Handle logo file
 	handleLogoFile(file) {
 		if (!file.type.startsWith('image/')) {
-			this.showToast('error', 'Por favor selecciona un archivo de imagen válido');
+			this.showToast('error', this.t('upload.invalidType'));
 			return;
 		}
 
 		if (file.size > 2 * 1024 * 1024) { // 2MB limit
-			this.showToast('error', 'El archivo es demasiado grande. Máximo 2MB');
+			this.showToast('error', this.t('upload.tooLarge'));
 			return;
 		}
 
@@ -1254,7 +1257,7 @@ class QRGeneratorApp {
 		document.getElementById('logoPreview').style.display = 'none';
 		document.getElementById('fileUploadArea').style.display = 'block';
 
-		this.showToast('success', 'Personalización restablecida');
+		this.showToast('success', this.t('customize.reset'));
 	}
 
 	// Apply customization
@@ -1262,7 +1265,7 @@ class QRGeneratorApp {
 		if (this.generatedQR) {
 			this.generateQR(); // Regenerate with new settings
 		}
-		this.showToast('success', 'Cambios aplicados');
+		this.showToast('success', this.t('customize.applied'));
 	}
 
 	// Setup donation buttons
@@ -1314,13 +1317,13 @@ class QRGeneratorApp {
 		const openBtn = document.getElementById('openResultBtn');
 		
 		let stream = null;
-		let scanning = false;
 		
 		startBtn?.addEventListener('click', async () => {
 			try {
 				stream = await navigator.mediaDevices.getUserMedia({ 
 					video: { facingMode: 'environment' } 
 				});
+				this._scannerStream = stream;
 				video.srcObject = stream;
 				startBtn.disabled = true;
 				stopBtn.disabled = false;
@@ -1394,8 +1397,8 @@ class QRGeneratorApp {
 						scannerResult.style.display = 'block';
 						
 						// Stop scanning
-						if (this.stream) {
-							this.stream.getTracks().forEach(track => track.stop());
+						if (this._scannerStream) {
+							this._scannerStream.getTracks().forEach(track => track.stop());
 						}
 						
 						const startBtn = document.getElementById('startScannerBtn');
@@ -1453,26 +1456,47 @@ class QRGeneratorApp {
 
 	// Convert QR code to SVG
 	qrToSVG(data, options = {}) {
-		// This is a simplified SVG conversion
-		// In a real implementation, you would need to parse the QR code matrix
-		// and generate SVG paths accordingly
-		
 		const size = options.size || 256;
 		const foreground = options.foreground || '#000000';
 		const background = options.background || '#FFFFFF';
-		
-		// Simple SVG template - in practice, you'd generate actual QR modules
-		const svg = `
-			<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-				<rect width="${size}" height="${size}" fill="${background}" />
-				<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" 
-						fill="${foreground}" font-family="Arial" font-size="${size/10}">
-					QR Code
-				</text>
-			</svg>
-		`;
-		
-		return `data:image/svg+xml;base64,${btoa(svg)}`;
+		const margin = options.margin || 4;
+
+		const tempDiv = document.createElement('div');
+		tempDiv.style.position = 'absolute';
+		tempDiv.style.left = '-9999px';
+		document.body.appendChild(tempDiv);
+
+		try {
+			const qr = new QRCode(tempDiv, {
+				text: data,
+				width: size,
+				errorCorrectionLevel: options.errorCorrectionLevel || 'M',
+				color: { dark: foreground, light: background }
+			});
+
+			const qrData = qr._oQRCode;
+			if (!qrData) throw new Error('QR Code not generated');
+
+			const moduleCount = qrData.getModuleCount();
+			const cellSize = Math.floor((size - 2 * margin) / moduleCount);
+			const offset = Math.floor((size - moduleCount * cellSize) / 2);
+
+			let rects = '';
+			for (let row = 0; row < moduleCount; row++) {
+				for (let col = 0; col < moduleCount; col++) {
+					if (qrData.isDark(row, col)) {
+						const x = offset + col * cellSize;
+						const y = offset + row * cellSize;
+						rects += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${foreground}"/>`;
+					}
+				}
+			}
+
+			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="${size}" height="${size}" fill="${background}"/>${rects}</svg>`;
+			return `data:image/svg+xml;base64,${btoa(svg)}`;
+		} finally {
+			document.body.removeChild(tempDiv);
+		}
 	}
 
 	// Download all batch QRs as ZIP
@@ -1606,14 +1630,13 @@ class QRGeneratorApp {
 			
 			// Add QR code image to PDF
 			const img = new Image();
-			img.src = this.generatedQR.image;
-			
 			img.onload = () => {
 				pdf.addImage(img, 'PNG', 10, 10, 100, 100);
 				pdf.text(this.t('export.pdfTitle', { type: this.generatedQR.type }), 10, 120);
 				pdf.save(`qr-${this.currentQRType.id}-${Date.now()}.pdf`);
 				this.showToast('success', this.t('export.pdf'));
 			};
+			img.src = this.generatedQR.image;
 		} else {
 			// Load jsPDF dynamically
 			const script = document.createElement('script');
@@ -1626,14 +1649,13 @@ class QRGeneratorApp {
 				
 				// Add QR code image to PDF
 				const img = new Image();
-				img.src = this.generatedQR.image;
-				
 				img.onload = () => {
 					pdf.addImage(img, 'PNG', 10, 10, 100, 100);
 					pdf.text(this.t('export.pdfTitle', { type: this.generatedQR.type }), 10, 120);
 					pdf.save(`qr-${this.currentQRType.id}-${Date.now()}.pdf`);
 					this.showToast('success', this.t('export.pdf'));
 				};
+				img.src = this.generatedQR.image;
 			};
 			document.head.appendChild(script);
 		}
@@ -1696,37 +1718,8 @@ class QRGeneratorApp {
 				try {
 					// Generate QR code based on type using the proper QR_TYPES generator
 					let qrData = line;
-					if (QR_TYPES[qrType]) {
-						// For batch generation, we need to format the data according to the QR type
-						switch (qrType) {
-							case 'url':
-								// URLs are already in the correct format
-								qrData = line;
-								break;
-							case 'text':
-								// Text is already in the correct format
-								qrData = line;
-								break;
-							case 'email':
-								// Format as mailto link
-								qrData = `mailto:${line}`;
-								break;
-							case 'sms':
-								// Format as SMS link
-								qrData = `sms:${line}`;
-								break;
-							case 'wifi':
-								// Format as WIFI config (simple format)
-								qrData = `WIFI:S:${line};;`;
-								break;
-							case 'vcard':
-								// Format as simple vCard
-								qrData = `BEGIN:VCARD\nFN:${line}\nEND:VCARD`;
-								break;
-							default:
-								// For other types, use the line as-is
-								qrData = line;
-						}
+					if (QR_TYPES[qrType] && QR_TYPES[qrType].generate) {
+						qrData = QR_TYPES[qrType].generate({ url: line, text: line, email: line, ssid: line, phone: line, firstName: line });
 					}
 
 					const qrImage = await this.createQRCode(qrData, options);
@@ -1740,13 +1733,21 @@ class QRGeneratorApp {
 					// Create result item
 					const resultItem = document.createElement('div');
 					resultItem.className = 'result-item';
-					resultItem.innerHTML = `
-						<img src="${qrImage}" alt="QR Code ${i + 1}" />
-						<div class="result-data">${line.substring(0, 30)}${line.length > 30 ? '...' : ''}</div>
-						<div class="result-actions">
-							<button class="btn btn-small btn-primary" data-index="${i}" onclick="window.qrApp.downloadBatchQR(${i})">${this.t('batch.download.single')}</button>
-						</div>
-					`;
+					const imgContainer = document.createElement('div');
+					imgContainer.innerHTML = `<img src="${qrImage}" alt="QR Code ${i + 1}" />`;
+					resultItem.appendChild(imgContainer.firstElementChild);
+					const dataDiv = document.createElement('div');
+					dataDiv.className = 'result-data';
+					dataDiv.textContent = line.substring(0, 30) + (line.length > 30 ? '...' : '');
+					resultItem.appendChild(dataDiv);
+					const actionsDiv = document.createElement('div');
+					actionsDiv.className = 'result-actions';
+					const dlBtn = document.createElement('button');
+					dlBtn.className = 'btn btn-small btn-primary';
+					dlBtn.textContent = this.t('batch.download.single');
+					dlBtn.addEventListener('click', () => this.downloadBatchQR(i));
+					actionsDiv.appendChild(dlBtn);
+					resultItem.appendChild(actionsDiv);
 
 					batchResultsGrid.appendChild(resultItem);
 

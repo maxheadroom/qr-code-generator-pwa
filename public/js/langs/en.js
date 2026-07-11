@@ -171,5 +171,14 @@ export default {
     'qr.error': 'Error generating QR: {error}',
     'qr.dataError': 'Could not generate QR data',
     'copy.success': 'Copied to clipboard',
-    'copy.error': 'Failed to copy to clipboard'
+    'copy.error': 'Failed to copy to clipboard',
+    'validation.error': 'Form validation error',
+    'qr.errorLibrary': 'QR library not loaded. Attempting to load...',
+    'qr.errorLoad': 'Could not load QR library. Check your connection.',
+    'qr.shareText': 'Generated QR',
+    'qr.shareError': 'Error sharing QR',
+    'upload.invalidType': 'Please select a valid image file',
+    'upload.tooLarge': 'File is too large. Maximum 2MB',
+    'customize.reset': 'Customization reset',
+    'customize.applied': 'Changes applied'
 };

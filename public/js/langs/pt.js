@@ -171,5 +171,14 @@ export default {
     'qr.error': 'Erro ao gerar QR: {error}',
     'qr.dataError': 'Não foi possível gerar dados do QR',
     'copy.success': 'Copiado para a área de transferência',
-    'copy.error': 'Falha ao copiar para a área de transferência'
+    'copy.error': 'Falha ao copiar para a área de transferência',
+    'validation.error': 'Erro de validação do formulário',
+    'qr.errorLibrary': 'Biblioteca QR não carregada. Tentando carregar...',
+    'qr.errorLoad': 'Não foi possível carregar a biblioteca QR. Verifique sua conexão.',
+    'qr.shareText': 'QR gerado',
+    'qr.shareError': 'Erro ao compartilhar QR',
+    'upload.invalidType': 'Selecione um arquivo de imagem válido',
+    'upload.tooLarge': 'Arquivo muito grande. Máximo 2MB',
+    'customize.reset': 'Personalização redefinida',
+    'customize.applied': 'Alterações aplicadas'
 };

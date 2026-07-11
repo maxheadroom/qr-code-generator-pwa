@@ -171,5 +171,14 @@ export default {
     'qr.error': 'Erreur lors de la génération du QR : {error}',
     'qr.dataError': 'Impossible de générer les données du QR',
     'copy.success': 'Copié dans le presse-papiers',
-    'copy.error': 'Échec de la copie dans le presse-papiers'
+    'copy.error': 'Échec de la copie dans le presse-papiers',
+    'validation.error': 'Erreur de validation du formulaire',
+    'qr.errorLibrary': 'Bibliothèque QR non chargée. Tentative de chargement...',
+    'qr.errorLoad': 'Impossible de charger la bibliothèque QR. Vérifiez votre connexion.',
+    'qr.shareText': 'QR généré',
+    'qr.shareError': 'Erreur lors du partage du QR',
+    'upload.invalidType': 'Veuillez sélectionner un fichier image valide',
+    'upload.tooLarge': 'Fichier trop volumineux. Maximum 2MB',
+    'customize.reset': 'Personnalisation réinitialisée',
+    'customize.applied': 'Modifications appliquées'
 };

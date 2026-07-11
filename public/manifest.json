@@ -50,7 +50,7 @@
 			"url": "/?type=url",
 			"icons": [
 				{
-					"src": "assets/img/logo.png",
+					"src": "assets/icons/icon-192x192.png",
 					"sizes": "96x96"
 				}
 			]
@@ -62,7 +62,7 @@
 			"url": "/?type=wifi",
 			"icons": [
 				{
-					"src": "assets/img/logo.png",
+					"src": "assets/icons/icon-192x192.png",
 					"sizes": "96x96"
 				}
 			]
@@ -74,7 +74,7 @@
 			"url": "/?type=vcard",
 			"icons": [
 				{
-					"src": "assets/img/logo.png",
+					"src": "assets/icons/icon-192x192.png",
 					"sizes": "96x96"
 				}
 			]
