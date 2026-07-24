@@ -121,4 +121,4 @@ Deploy the `public/` directory to any static hosting:
 
 ## Author
 
-**Juan Marcos Bravo Medina** — [GitHub](https://github.com/jmarc9909)
+**Juan Marcos Bravo Medina** — [GitHub](https://github.com/jmarc9901)
