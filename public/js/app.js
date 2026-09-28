@@ -794,6 +794,26 @@ class QRGeneratorApp {
 		});
 	}
 
+	// Turn a data: URL into a Blob. fetch() cannot be used for this because the
+	// Content-Security-Policy of the page (connect-src 'self') blocks data: URLs.
+	dataUrlToBlob(dataUrl) {
+		const comma = dataUrl.indexOf(',');
+		const header = dataUrl.slice(0, comma);
+		const payload = dataUrl.slice(comma + 1);
+		const mime = (header.match(/^data:([^;,]+)/) || [])[1] || 'application/octet-stream';
+
+		if (!header.includes(';base64')) {
+			return new Blob([decodeURIComponent(payload)], { type: mime });
+		}
+
+		const binary = atob(payload);
+		const bytes = new Uint8Array(binary.length);
+		for (let i = 0; i < binary.length; i++) {
+			bytes[i] = binary.charCodeAt(i);
+		}
+		return new Blob([bytes], { type: mime });
+	}
+
 	// Draw the module matrix on a canvas, applying gradient and logo effects
 	async renderQRImage(matrix, options) {
 		const { modules, moduleCount } = matrix;
@@ -898,8 +918,7 @@ class QRGeneratorApp {
 		}
 
 		// Convert data URL to blob and save
-		const response = await fetch(this.generatedQR.image);
-		const blob = await response.blob();
+		const blob = this.dataUrlToBlob(this.generatedQR.image);
 		saveAs(blob, `qr-${this.currentQRType.id}-${Date.now()}.png`);
 	}
 
@@ -925,8 +944,7 @@ class QRGeneratorApp {
 
 		if (navigator.share) {
 			try {
-				const response = await fetch(this.generatedQR.image);
-				const blob = await response.blob();
+				const blob = this.dataUrlToBlob(this.generatedQR.image);
 				const file = new File([blob], 'qr-code.png', { type: 'image/png' });
 
 				await navigator.share({
@@ -1505,8 +1523,7 @@ class QRGeneratorApp {
 		}
 
 		// Convert data URL to blob and save
-		const response = await fetch(qrCode.image);
-		const blob = await response.blob();
+		const blob = this.dataUrlToBlob(qrCode.image);
 		const filename = `batch-qr-${index + 1}-${Date.now()}.png`;
 		saveAs(blob, filename);
 		
@@ -1584,8 +1601,7 @@ class QRGeneratorApp {
 			// Add each QR code to the ZIP
 			for (let i = 0; i < this.batchGeneratedCodes.length; i++) {
 				const qrCode = this.batchGeneratedCodes[i];
-				const response = await fetch(qrCode.image);
-				const blob = await response.blob();
+				const blob = this.dataUrlToBlob(qrCode.image);
 				zip.file(`qr-${i + 1}.png`, blob);
 			}
 
@@ -1616,7 +1632,7 @@ class QRGeneratorApp {
 
 			const script = document.createElement('script');
 			script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-			script.integrity = 'sha512-XMVd2n9g32bQfPmf2M5i0HNYfQGVNbV5MdT5iFsEBlk0OkNfy+Bg2nZJvtx/fLXz1szpW/KYx/nG/rus79BYUA==';
+			script.integrity = 'sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==';
 			script.crossOrigin = 'anonymous';
 			script.onload = () => resolve();
 			script.onerror = () => resolve(); // Continue without JSZip
@@ -1659,8 +1675,7 @@ class QRGeneratorApp {
 		}
 
 		// Convert data URL to blob and save
-		const response = await fetch(this.generatedQR.image);
-		const blob = await response.blob();
+		const blob = this.dataUrlToBlob(this.generatedQR.image);
 		const filename = `qr-${this.currentQRType.id}-${Date.now()}.png`;
 		saveAs(blob, filename);
 
@@ -1678,8 +1693,7 @@ class QRGeneratorApp {
 		const svgData = this.qrToSVG(this.generatedQR.data, this.generatedQR.options);
 		
 		// Convert data URL to blob
-		const response = await fetch(svgData);
-		const blob = await response.blob();
+		const blob = this.dataUrlToBlob(svgData);
 		const filename = `qr-${this.currentQRType.id}-${Date.now()}.svg`;
 		saveAs(blob, filename);
 

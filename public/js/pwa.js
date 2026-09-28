@@ -21,7 +21,7 @@ class PWA {
 	async registerServiceWorker() {
 		if ('serviceWorker' in navigator) {
 			try {
-				const registration = await navigator.serviceWorker.register('/sw.js');
+				const registration = await navigator.serviceWorker.register('sw.js');
 				console.log('Service Worker registered:', registration);
 
 				// Handle updates
@@ -164,8 +164,8 @@ class PWA {
 	showNotification(title, options = {}) {
 		if ('Notification' in window && Notification.permission === 'granted') {
 			const defaultOptions = {
-				icon: '/assets/icons/android-chrome-192x192.png',
-				badge: '/assets/icons/favicon-32x32.png',
+				icon: 'assets/icons/icon-192x192.png',
+				badge: 'assets/icons/favicon-32x32.png',
 				vibrate: [100, 50, 100],
 				...options
 			};
