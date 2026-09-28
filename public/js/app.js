@@ -9,6 +9,7 @@ class QRGeneratorApp {
 		this.history = this.loadHistory();
 		this.currentLanguage = this.getInitialLanguage();
 		this.translations = {};
+		this.logo = null; // center logo { dataUrl, width, height }, downscaled and kept in memory only
 		
 		// Import utility functions
 		this.utils = window.QRUtils || null;
@@ -681,229 +682,191 @@ class QRGeneratorApp {
 			errorCorrectionLevel: qrErrorLevel ? qrErrorLevel.value : 'M',
 			foreground: qrForeground ? qrForeground.value : '#000000',
 			background: qrBackground ? qrBackground.value : '#FFFFFF',
-			margin: qrMargin ? parseInt(qrMargin.value) : 4
+			margin: qrMargin ? parseInt(qrMargin.value) : 4,
+			effects: {
+				logo: this.logo,
+				gradient: document.getElementById('gradientEnabled')?.checked ? {
+					start: document.getElementById('gradientStart').value,
+					end: document.getElementById('gradientEnd').value,
+					direction: document.getElementById('gradientDirection').value
+				} : null
+			}
 		};
+
+		// A logo hides part of the code, so use the highest error correction
+		if (options.effects.logo) {
+			options.errorCorrectionLevel = 'H';
+		}
 
 		return options;
 	}
 
 	async createQRCode(data, options) {
-        // Check if Web Workers are supported and we're not on file:// protocol
-        if (typeof Worker !== 'undefined' && window.location.protocol !== 'file:') {
-            return new Promise((resolve, reject) => {
-                try {
-                    // Create Web Worker
-                    const worker = new Worker('js/qr-worker.js');
-                    
-                    // Send data to worker
-                    worker.postMessage({ data, options });
-                    
-                    // Listen for response from worker
-                    worker.onmessage = (e) => {
-                        const result = e.data;
-                        worker.terminate(); // Clean up worker
-                        
-                        if (result.success) {
-                            // Generate the actual image from the QR data in the main thread
-                            const imageDataURL = this.generateQRImageFromData(result);
-                            resolve(imageDataURL);
-                        } else {
-                            console.warn('Web Worker failed, falling back to main thread:', result.error);
-                            // Fallback to original method
-                            this.createQRCodeFallback(data, options).then(resolve).catch(reject);
-                        }
-                    };
-                    
-                    // Handle worker errors
-                    worker.onerror = (error) => {
-                        worker.terminate();
-                        console.warn('Web Worker error, falling back to main thread:', error);
-                        // Fallback to original method
-                        this.createQRCodeFallback(data, options).then(resolve).catch(reject);
-                    };
-                    
-                    // Set timeout for worker (increased to 30 seconds for complex QR codes)
-                    setTimeout(() => {
-                        worker.terminate();
-                        console.warn('Web Worker timeout, falling back to main thread');
-                        // Fallback to original method
-                        this.createQRCodeFallback(data, options).then(resolve).catch(reject);
-                    }, 30000); // 30 second timeout
-                } catch (error) {
-                    console.warn('Error creating Web Worker, falling back to main thread:', error);
-                    // Fallback to original method
-                    this.createQRCodeFallback(data, options).then(resolve).catch(reject);
-                }
-            });
-        } else {
-            // Fallback for browsers that don't support Web Workers or when on file:// protocol
-            return this.createQRCodeFallback(data, options);
-        }
-    }
-	
-	// Generate QR image from data (used when Web Worker returns QR data)
-    generateQRImageFromData(result) {
-        // Handle the new data structure from the Web Worker
-        if (result.modules && result.moduleCount) {
-            // This is data from the Web Worker
-            const modules = result.modules;
-            const moduleCount = result.moduleCount;
-            const options = result.options || {};
-            
-            // Create canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Set canvas size
-            const size = options.width || 256;
-            canvas.width = size;
-            canvas.height = size;
-            
-            const cellSize = Math.floor(size / moduleCount);
-            const margin = options.margin || 4;
-            
-            // Fill background
-            ctx.fillStyle = options.color?.light || '#FFFFFF';
-            ctx.fillRect(0, 0, size, size);
-            
-            // Draw QR code from modules data
-            ctx.fillStyle = options.color?.dark || '#000000';
-            
-            for (let row = 0; row < moduleCount; row++) {
-                for (let col = 0; col < moduleCount; col++) {
-                    if (modules[row][col]) {
-                        const x = margin + col * cellSize;
-                        const y = margin + row * cellSize;
-                        ctx.fillRect(x, y, cellSize, cellSize);
-                    }
-                }
-            }
-            
-            // Convert to data URL
-            return canvas.toDataURL('image/png');
-        } else {
-            // Handle the old format or direct QR data
-            const qrData = result.qrData || result;
-            const options = result.options || {};
-            
-            // Create canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Set canvas size
-            const size = options.width || 256;
-            canvas.width = size;
-            canvas.height = size;
-            
-            // Get QR module count
-            const moduleCount = qrData.getModuleCount();
-            const cellSize = Math.floor(size / moduleCount);
-            const margin = options.margin || 4;
-            
-            // Fill background
-            ctx.fillStyle = options.color?.light || '#FFFFFF';
-            ctx.fillRect(0, 0, size, size);
-            
-            // Draw QR code
-            ctx.fillStyle = options.color?.dark || '#000000';
-            
-            for (let row = 0; row < moduleCount; row++) {
-                for (let col = 0; col < moduleCount; col++) {
-                    if (qrData.isDark(row, col)) {
-                        const x = margin + col * cellSize;
-                        const y = margin + row * cellSize;
-                        ctx.fillRect(x, y, cellSize, cellSize);
-                    }
-                }
-            }
-            
-            // Convert to data URL
-            return canvas.toDataURL('image/png');
-        }
-    }
-	
-	// Fallback method for QR code generation
-	async createQRCodeFallback(data, options) {
-		return new Promise((resolve, reject) => {
+		if (!data || data.trim() === '') {
+			throw new Error('No data provided for QR code');
+		}
+
+		const matrix = await this.getQRMatrix(data, options);
+		return this.renderQRImage(matrix, options);
+	}
+
+	// Build the QR module matrix: Web Worker first, main thread as fallback
+	async getQRMatrix(data, options) {
+		// Workers cannot be started from file:// pages
+		if (typeof Worker !== 'undefined' && window.location.protocol !== 'file:') {
 			try {
-				// Check if QRCode library is available
-				if (typeof QRCode === 'undefined') {
-					reject(new Error('QRCode library not loaded'));
-					return;
-				}
-
-				// Validate data
-				if (!data || data.trim() === '') {
-					reject(new Error('No data provided for QR code'));
-					return;
-				}
-
-				console.log('Creating QR with options:', options);
-				console.log('QRCode library type:', typeof QRCode);
-
-				// Get all customization options with defaults
-				const qrOptions = {
-					width: options.size || 256,
-					errorCorrectionLevel: options.errorCorrectionLevel || 'M',
-					color: {
-						dark: options.foreground || '#000000',
-						light: options.background || '#FFFFFF'
-					},
-					margin: options.margin || 4
-				};
-
-				console.log('QR Options being applied:', qrOptions);
-
-				// Add logo if available
-				const logoImage = document.getElementById('logoImage');
-				if (logoImage && logoImage.src && !logoImage.src.includes('data:,')) {
-					qrOptions.logo = logoImage.src;
-					qrOptions.logoWidth = Math.floor(qrOptions.width * 0.2);
-					qrOptions.logoHeight = Math.floor(qrOptions.width * 0.2);
-					console.log('Logo applied:', logoImage.src);
-				}
-
-				// Add gradient if enabled
-				const gradientStart = document.getElementById('gradientStart')?.value;
-				const gradientEnd = document.getElementById('gradientEnd')?.value;
-				
-				if (gradientStart && gradientEnd && gradientStart !== gradientEnd) {
-					qrOptions.color = {
-						dark: gradientStart,
-						light: options.background || '#FFFFFF'
-					};
-					console.log('Gradient applied:', gradientStart, 'to', gradientEnd);
-				}
-
-				console.log('Final QR options:', qrOptions);
-
-				// Try to generate QR with callback style first
-				if (typeof QRCode.toDataURL === 'function') {
-					QRCode.toDataURL(data, qrOptions, (err, url) => {
-						if (err) {
-							console.error('QRCode generation error:', err);
-							reject(err);
-						} else {
-							console.log('QR generated successfully with callback');
-							resolve(url);
-						}
-					});
-				} else {
-					// Fallback for non-callback style
-					try {
-						const url = QRCode.toDataURL(data, qrOptions);
-						console.log('QR generated successfully without callback');
-						resolve(url);
-					} catch (error) {
-						console.error('QRCode generation error (non-callback):', error);
-						reject(error);
-					}
-				}
+				return await this.getQRMatrixFromWorker(data, options);
 			} catch (error) {
-				console.error('Error in createQRCode:', error);
-				reject(error);
+				console.warn('Web Worker failed, falling back to main thread:', error);
 			}
+		}
+		return this.getQRMatrixMainThread(data, options);
+	}
+
+	getQRMatrixFromWorker(data, options) {
+		return new Promise((resolve, reject) => {
+			let worker;
+			try {
+				worker = new Worker('js/qr-worker.js');
+			} catch (error) {
+				reject(error);
+				return;
+			}
+
+			const finish = (settle, value) => {
+				clearTimeout(timer);
+				worker.terminate();
+				settle(value);
+			};
+			// 30 seconds for complex QR codes
+			const timer = setTimeout(() => finish(reject, new Error('Web Worker timeout')), 30000);
+
+			worker.onmessage = (e) => {
+				if (e.data.success) {
+					finish(resolve, { modules: e.data.modules, moduleCount: e.data.moduleCount });
+				} else {
+					finish(reject, new Error(e.data.error));
+				}
+			};
+			worker.onerror = (e) => finish(reject, new Error(e.message || 'Web Worker error'));
+
+			// Send only what the worker needs, not the logo image
+			worker.postMessage({
+				data,
+				options: {
+					size: options.size,
+					foreground: options.foreground,
+					background: options.background,
+					margin: options.margin,
+					errorCorrectionLevel: options.errorCorrectionLevel
+				}
+			});
 		});
+	}
+
+	getQRMatrixMainThread(data, options) {
+		if (typeof QRCode === 'undefined' || typeof QRCode.generateQRData !== 'function') {
+			throw new Error('QRCode library not loaded');
+		}
+
+		const result = QRCode.generateQRData(data, {
+			width: options.size || 256,
+			height: options.size || 256,
+			errorCorrectionLevel: options.errorCorrectionLevel || 'M'
+		});
+		return { modules: result.modules, moduleCount: result.moduleCount };
+	}
+
+	// Symmetric layout shared by the PNG and SVG renderers
+	getQRLayout(size, margin, moduleCount) {
+		const cellSize = Math.max(1, Math.floor((size - 2 * margin) / moduleCount));
+		const qrSize = cellSize * moduleCount;
+		const offset = Math.floor((size - qrSize) / 2);
+		return { cellSize, qrSize, offset };
+	}
+
+	loadImage(src) {
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			img.onload = () => resolve(img);
+			img.onerror = () => reject(new Error(this.t('upload.invalidType')));
+			img.src = src;
+		});
+	}
+
+	// Draw the module matrix on a canvas, applying gradient and logo effects
+	async renderQRImage(matrix, options) {
+		const { modules, moduleCount } = matrix;
+		const size = options.size || 256;
+		const margin = options.margin ?? 4;
+		const effects = options.effects || {};
+		const layout = this.getQRLayout(size, margin, moduleCount);
+
+		// Load the logo before drawing so a broken image fails loudly
+		const logo = effects.logo ? await this.loadImage(effects.logo.dataUrl) : null;
+
+		const canvas = document.createElement('canvas');
+		canvas.width = size;
+		canvas.height = size;
+		const ctx = canvas.getContext('2d');
+
+		ctx.fillStyle = options.background || '#FFFFFF';
+		ctx.fillRect(0, 0, size, size);
+
+		ctx.fillStyle = effects.gradient
+			? this.createQRGradient(ctx, effects.gradient, layout.offset, layout.qrSize)
+			: (options.foreground || '#000000');
+		for (let row = 0; row < moduleCount; row++) {
+			for (let col = 0; col < moduleCount; col++) {
+				if (modules[row][col]) {
+					ctx.fillRect(layout.offset + col * layout.cellSize, layout.offset + row * layout.cellSize, layout.cellSize, layout.cellSize);
+				}
+			}
+		}
+
+		if (logo) {
+			const box = this.getLogoBox(effects.logo.width, effects.logo.height, layout);
+			ctx.fillStyle = options.background || '#FFFFFF';
+			ctx.fillRect(box.padX, box.padY, box.padW, box.padH);
+			ctx.imageSmoothingQuality = 'high';
+			ctx.drawImage(logo, box.x, box.y, box.w, box.h);
+		}
+
+		return canvas.toDataURL('image/png');
+	}
+
+	createQRGradient(ctx, gradient, offset, qrSize) {
+		const end = offset + qrSize;
+		const center = offset + qrSize / 2;
+		let fill;
+		switch (gradient.direction) {
+			case 'vertical':
+				fill = ctx.createLinearGradient(offset, offset, offset, end);
+				break;
+			case 'diagonal':
+				fill = ctx.createLinearGradient(offset, offset, end, end);
+				break;
+			case 'radial':
+				fill = ctx.createRadialGradient(center, center, 0, center, center, qrSize * Math.SQRT1_2);
+				break;
+			default:
+				fill = ctx.createLinearGradient(offset, offset, end, offset);
+		}
+		fill.addColorStop(0, gradient.start);
+		fill.addColorStop(1, gradient.end);
+		return fill;
+	}
+
+	// Logo fits in a box 20% of the QR side, keeps its aspect ratio and sits on a padded background
+	getLogoBox(imageWidth, imageHeight, layout) {
+		const maxSide = Math.floor(layout.qrSize * 0.2);
+		const scale = Math.min(maxSide / imageWidth, maxSide / imageHeight);
+		const w = Math.max(1, Math.round(imageWidth * scale));
+		const h = Math.max(1, Math.round(imageHeight * scale));
+		const x = Math.round(layout.offset + (layout.qrSize - w) / 2);
+		const y = Math.round(layout.offset + (layout.qrSize - h) / 2);
+		const pad = Math.max(2, layout.cellSize);
+		return { x, y, w, h, padX: x - pad, padY: y - pad, padW: w + 2 * pad, padH: h + 2 * pad };
 	}
 
 	displayQR() {
@@ -994,8 +957,11 @@ class QRGeneratorApp {
 	saveToHistory() {
 		if (!this.generatedQR) return;
 
+		// Keep the logo image out of localStorage (it can be large); remember only that one was used
+		const { effects = {}, ...options } = this.generatedQR.options;
 		const historyItem = {
 			...this.generatedQR,
+			options: { ...options, effects: { ...effects, logo: Boolean(effects.logo) } },
 			id: Date.now().toString()
 		};
 
@@ -1131,6 +1097,7 @@ class QRGeneratorApp {
 
 		// Logo upload
 		this.setupLogoUpload();
+		this.setupGradientToggle();
 
 		// Customization actions
 		document.getElementById('resetCustomization')?.addEventListener('click', () => {
@@ -1233,7 +1200,6 @@ class QRGeneratorApp {
 	setupLogoUpload() {
 		const fileUploadArea = document.getElementById('fileUploadArea');
 		const logoUpload = document.getElementById('logoUpload');
-		const logoPreview = document.getElementById('logoPreview');
 		const removeLogo = document.getElementById('removeLogo');
 
 		// Drag and drop
@@ -1264,10 +1230,50 @@ class QRGeneratorApp {
 
 		// Remove logo
 		removeLogo?.addEventListener('click', () => {
-			logoUpload.value = '';
-			logoPreview.style.display = 'none';
-			fileUploadArea.style.display = 'block';
+			this.clearLogo();
 		});
+	}
+
+	// Enable the gradient controls only while the gradient is switched on
+	setupGradientToggle() {
+		const toggle = document.getElementById('gradientEnabled');
+		toggle?.addEventListener('change', () => this.updateGradientControls());
+		this.updateGradientControls();
+	}
+
+	updateGradientControls() {
+		const enabled = document.getElementById('gradientEnabled')?.checked;
+		['gradientStart', 'gradientEnd', 'gradientDirection'].forEach(id => {
+			const control = document.getElementById(id);
+			if (control) control.disabled = !enabled;
+		});
+	}
+
+	// Forget the logo: in-memory copy, preview image and file input
+	clearLogo() {
+		this.logo = null;
+		const logoImage = document.getElementById('logoImage');
+		if (logoImage) logoImage.removeAttribute('src');
+		document.getElementById('logoUpload').value = '';
+		document.getElementById('logoPreview').style.display = 'none';
+		document.getElementById('fileUploadArea').style.display = 'block';
+	}
+
+	// Shrink the logo so it stays small in memory, SVG and PDF exports (keeps transparency)
+	async prepareLogo(dataUrl, maxSide = 512) {
+		const img = await this.loadImage(dataUrl);
+		if (!img.naturalWidth || !img.naturalHeight) {
+			throw new Error(this.t('upload.invalidType'));
+		}
+
+		const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+		const canvas = document.createElement('canvas');
+		canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+		canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+		const ctx = canvas.getContext('2d');
+		ctx.imageSmoothingQuality = 'high';
+		ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+		return { dataUrl: canvas.toDataURL('image/png'), width: canvas.width, height: canvas.height };
 	}
 
 	// Handle logo file
@@ -1283,14 +1289,17 @@ class QRGeneratorApp {
 		}
 
 		const reader = new FileReader();
-		reader.onload = (e) => {
-			const logoImage = document.getElementById('logoImage');
-			const logoPreview = document.getElementById('logoPreview');
-			const fileUploadArea = document.getElementById('fileUploadArea');
+		reader.onload = async (e) => {
+			try {
+				this.logo = await this.prepareLogo(e.target.result);
+			} catch (error) {
+				this.showToast('error', error.message);
+				return;
+			}
 
-			logoImage.src = e.target.result;
-			logoPreview.style.display = 'block';
-			fileUploadArea.style.display = 'none';
+			document.getElementById('logoImage').src = this.logo.dataUrl;
+			document.getElementById('logoPreview').style.display = 'block';
+			document.getElementById('fileUploadArea').style.display = 'none';
 		};
 		reader.readAsDataURL(file);
 	}
@@ -1309,11 +1318,10 @@ class QRGeneratorApp {
 		document.getElementById('gradientStart').value = '#2563eb';
 		document.getElementById('gradientEnd').value = '#1d4ed8';
 		document.getElementById('gradientDirection').value = 'horizontal';
+		document.getElementById('gradientEnabled').checked = false;
+		this.updateGradientControls();
 
-		// Reset logo
-		document.getElementById('logoUpload').value = '';
-		document.getElementById('logoPreview').style.display = 'none';
-		document.getElementById('fileUploadArea').style.display = 'block';
+		this.clearLogo();
 
 		this.showToast('success', this.t('customize.reset'));
 	}
@@ -1505,49 +1513,57 @@ class QRGeneratorApp {
 		this.showToast('success', this.t('batch.download.successSingle', { index: index + 1 }));
 	}
 
-	// Convert QR code to SVG
+	// Convert QR code to SVG, with the same gradient and logo as the PNG
 	qrToSVG(data, options = {}) {
 		const size = options.size || 256;
 		const foreground = options.foreground || '#000000';
 		const background = options.background || '#FFFFFF';
-		const margin = options.margin || 4;
+		const margin = options.margin ?? 4;
+		const effects = options.effects || {};
 
-		const tempDiv = document.createElement('div');
-		tempDiv.style.position = 'absolute';
-		tempDiv.style.left = '-9999px';
-		document.body.appendChild(tempDiv);
+		const { modules, moduleCount } = this.getQRMatrixMainThread(data, options);
+		const layout = this.getQRLayout(size, margin, moduleCount);
+		const { offset, qrSize, cellSize } = layout;
+		const end = offset + qrSize;
+		const center = offset + qrSize / 2;
 
-		try {
-			const qr = new QRCode(tempDiv, {
-				text: data,
-				width: size,
-				errorCorrectionLevel: options.errorCorrectionLevel || 'M',
-				color: { dark: foreground, light: background }
-			});
+		let defs = '';
+		let fill = foreground;
+		if (effects.gradient) {
+			const { start, end: stop, direction } = effects.gradient;
+			const stops = `<stop offset="0" stop-color="${start}"/><stop offset="1" stop-color="${stop}"/>`;
+			const lines = {
+				horizontal: [offset, offset, end, offset],
+				vertical: [offset, offset, offset, end],
+				diagonal: [offset, offset, end, end]
+			};
+			if (direction === 'radial') {
+				defs = `<defs><radialGradient id="qr-gradient" gradientUnits="userSpaceOnUse" cx="${center}" cy="${center}" r="${qrSize * Math.SQRT1_2}">${stops}</radialGradient></defs>`;
+			} else {
+				const [x1, y1, x2, y2] = lines[direction] || lines.horizontal;
+				defs = `<defs><linearGradient id="qr-gradient" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops}</linearGradient></defs>`;
+			}
+			fill = 'url(#qr-gradient)';
+		}
 
-			const qrData = qr._oQRCode;
-			if (!qrData) throw new Error('QR Code not generated');
-
-			const moduleCount = qrData.getModuleCount();
-			const cellSize = Math.floor((size - 2 * margin) / moduleCount);
-			const offset = Math.floor((size - moduleCount * cellSize) / 2);
-
-			let rects = '';
-			for (let row = 0; row < moduleCount; row++) {
-				for (let col = 0; col < moduleCount; col++) {
-					if (qrData.isDark(row, col)) {
-						const x = offset + col * cellSize;
-						const y = offset + row * cellSize;
-						rects += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${foreground}"/>`;
-					}
+		let rects = '';
+		for (let row = 0; row < moduleCount; row++) {
+			for (let col = 0; col < moduleCount; col++) {
+				if (modules[row][col]) {
+					rects += `<rect x="${offset + col * cellSize}" y="${offset + row * cellSize}" width="${cellSize}" height="${cellSize}"/>`;
 				}
 			}
-
-			const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="${size}" height="${size}" fill="${background}"/>${rects}</svg>`;
-			return `data:image/svg+xml;base64,${btoa(svg)}`;
-		} finally {
-			document.body.removeChild(tempDiv);
 		}
+
+		let logo = '';
+		if (effects.logo) {
+			const box = this.getLogoBox(effects.logo.width, effects.logo.height, layout);
+			logo = `<rect x="${box.padX}" y="${box.padY}" width="${box.padW}" height="${box.padH}" fill="${background}"/>` +
+				`<image xlink:href="${effects.logo.dataUrl}" x="${box.x}" y="${box.y}" width="${box.w}" height="${box.h}"/>`;
+		}
+
+		const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${defs}<rect width="${size}" height="${size}" fill="${background}"/><g fill="${fill}">${rects}</g>${logo}</svg>`;
+		return `data:image/svg+xml;base64,${btoa(svg)}`;
 	}
 
 	// Download all batch QRs as ZIP

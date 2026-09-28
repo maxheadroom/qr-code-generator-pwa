@@ -161,6 +161,11 @@ export default {
     // Effects Customization
     'effects.logo': 'Logo Central',
     'effects.gradient': 'Dégradé',
+    'effects.gradient.enable': 'Appliquer un dégradé au code QR',
+    'effects.gradient.horizontal': 'Horizontal',
+    'effects.gradient.vertical': 'Vertical',
+    'effects.gradient.diagonal': 'Diagonale',
+    'effects.gradient.radial': 'Radial',
     'upload.placeholder': 'Faites glisser une image ou cliquez pour sélectionner',
     'upload.supported': 'PNG, JPG jusqu\'à 2 Mo',
     

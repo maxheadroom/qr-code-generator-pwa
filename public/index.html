@@ -609,16 +609,20 @@
 								</svg>
 								<span data-i18n="effects.gradient">Gradient</span>
 							</label>
+							<label class="gradient-toggle" for="gradientEnabled" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+								<input type="checkbox" id="gradientEnabled">
+								<span data-i18n="effects.gradient.enable">Apply gradient to the QR code</span>
+							</label>
 							<div class="gradient-controls">
 								<div class="gradient-input-group">
 									<input type="color" id="gradientStart" value="#2563eb" class="form-control color-picker">
 									<input type="color" id="gradientEnd" value="#1d4ed8" class="form-control color-picker">
 								</div>
 								<select id="gradientDirection" class="form-control">
-									<option value="horizontal">Horizontal</option>
-									<option value="vertical">Vertical</option>
-									<option value="diagonal">Diagonal</option>
-									<option value="radial">Radial</option>
+									<option value="horizontal" data-i18n="effects.gradient.horizontal">Horizontal</option>
+									<option value="vertical" data-i18n="effects.gradient.vertical">Vertical</option>
+									<option value="diagonal" data-i18n="effects.gradient.diagonal">Diagonal</option>
+									<option value="radial" data-i18n="effects.gradient.radial">Radial</option>
 								</select>
 							</div>
 						</div>

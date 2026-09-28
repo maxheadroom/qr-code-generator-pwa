@@ -161,6 +161,11 @@ export default {
     // Effects Customization
     'effects.logo': 'Logo in der Mitte',
     'effects.gradient': 'Farbverlauf',
+    'effects.gradient.enable': 'Farbverlauf auf den QR-Code anwenden',
+    'effects.gradient.horizontal': 'Horizontal',
+    'effects.gradient.vertical': 'Vertikal',
+    'effects.gradient.diagonal': 'Diagonal',
+    'effects.gradient.radial': 'Radial',
     'upload.placeholder': 'Bild hierher ziehen oder zum Auswählen klicken',
     'upload.supported': 'PNG, JPG bis 2 MB',
 

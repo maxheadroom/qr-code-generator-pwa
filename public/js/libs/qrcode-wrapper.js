@@ -98,6 +98,36 @@
         }
     };
     
+    // Add static method returning the module matrix, same shape as the worker wrapper
+    QRCodeWrapper.generateQRData = function(text, options) {
+        var wrapper = new QRCodeWrapper(text, options);
+        try {
+            var qrData = wrapper._qrCode._oQRCode;
+            if (!qrData) {
+                throw new Error('QR Code not generated');
+            }
+
+            var moduleCount = qrData.getModuleCount();
+            var modules = [];
+            for (var row = 0; row < moduleCount; row++) {
+                modules[row] = [];
+                for (var col = 0; col < moduleCount; col++) {
+                    modules[row][col] = qrData.isDark(row, col);
+                }
+            }
+
+            return {
+                modules: modules,
+                moduleCount: moduleCount,
+                options: options
+            };
+        } finally {
+            if (wrapper._tempDiv) {
+                document.body.removeChild(wrapper._tempDiv);
+            }
+        }
+    };
+    
     // Replace the global QRCode with our wrapper
     window.QRCode = QRCodeWrapper;
     

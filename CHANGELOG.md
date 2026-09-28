@@ -4,8 +4,13 @@
 
 ### Added
 - German translation (`de`), selectable in the language menu and through `?lang=de`
+- "Apply gradient" checkbox in the Effects tab; the gradient is off until it is ticked
 
 ### Fixed
+- Center logo and gradient were never drawn on the QR code. Both are now drawn for every generation path (Web Worker and main thread) and in the SVG export. The gradient supports its end colour and all four directions; the logo keeps its aspect ratio, is centered on the QR and is shrunk on upload
+- "Remove" on the center logo did not remove it from later QR codes
+- The default gradient colours replaced the foreground colour chosen by the user
+- Margin 0 was treated as margin 4, and the QR code was not centered in the PNG
 - Form labels, placeholders, dropdown options and validation messages were always Spanish, even in the English view (visible in the WiFi form). They now use translation keys in all four languages (en, es, pt, fr), with English fallbacks in `qr-types.js`
 - Form title and share text now use the translated QR type name
 - Update/online/offline toasts in `pwa.js` are translated
