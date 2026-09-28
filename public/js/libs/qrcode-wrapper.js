@@ -100,7 +100,14 @@
     
     // Add static method returning the module matrix, same shape as the worker wrapper
     QRCodeWrapper.generateQRData = function(text, options) {
-        var wrapper = new QRCodeWrapper(text, options);
+        // The library reads "correctLevel" (L, M, Q, H constants), not the level letter
+        var level = options.errorCorrectionLevel || 'M';
+        if (!(level in OriginalQRCode.CorrectLevel)) {
+            throw new Error('Unknown error correction level: ' + level);
+        }
+        var config = Object.assign({}, options, { correctLevel: OriginalQRCode.CorrectLevel[level] });
+
+        var wrapper = new QRCodeWrapper(text, config);
         try {
             var qrData = wrapper._qrCode._oQRCode;
             if (!qrData) {

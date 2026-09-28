@@ -51,8 +51,15 @@
         try {
             console.log('Worker Wrapper: Generating QR code for text:', text.substring(0, 50) + '...');
             
+            // The library reads "correctLevel" (L, M, Q, H constants), not the level letter
+            var level = options.errorCorrectionLevel || 'M';
+            if (!(level in OriginalQRCode.CorrectLevel)) {
+                throw new Error('Unknown error correction level: ' + level);
+            }
+            var config = Object.assign({}, options, { correctLevel: OriginalQRCode.CorrectLevel[level] });
+
             // Create QR code instance
-            var qrCode = new OriginalQRCode(options);
+            var qrCode = new OriginalQRCode(config);
             qrCode.makeCode(text);
             
             // Get the QR data

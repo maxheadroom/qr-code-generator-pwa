@@ -151,6 +151,14 @@ export default {
     // Basic Customization
     'basic.size': 'Größe',
     'basic.error': 'Fehlerkorrektur',
+    'errorLevel.L': 'Niedrig (7 %) - Mehr Daten',
+    'errorLevel.M': 'Mittel (15 %) - Ausgewogen',
+    'errorLevel.Q': 'Hoch (25 %) - Robuster',
+    'errorLevel.H': 'Maximal (30 %) - Sehr robust',
+    'sizeOption.128': '128x128 - Klein',
+    'sizeOption.256': '256x256 - Standard',
+    'sizeOption.512': '512x512 - Groß',
+    'sizeOption.1024': '1024x1024 - HD',
 
     // Advanced Customization
     'advanced.foreground': 'Vordergrundfarbe',

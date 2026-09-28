@@ -11,6 +11,7 @@
 - Center logo and gradient were never drawn on the QR code. Both are now drawn for every generation path (Web Worker and main thread) and in the SVG export. The gradient supports its end colour and all four directions; the logo keeps its aspect ratio, is centered on the QR and is shrunk on upload
 - "Remove" on the center logo did not remove it from later QR codes
 - The default gradient colours replaced the foreground colour chosen by the user
+- The Error Correction dropdown (single and batch) had no effect: every QR code was created at level H. The chosen level (L, M, Q or H) is now used, and the default M gives smaller, less dense QR codes than before. A center logo still forces level H
 - Margin 0 was treated as margin 4, and the QR code was not centered in the PNG
 - Offline support: the service worker used root paths (`/sw.js`, `/index.html`), so it did not register on GitHub Pages project sites; the cache list contained a file that does not exist, which made the install fail without a message; files needed at runtime (scanner, language files, worker files, icons) and the PDF/ZIP libraries from the CDN were not cached. The cache version is now `1.0.2`
 - PNG export, SVG export and the Download button did nothing in Chrome, because the Content-Security-Policy blocks `fetch()` of `data:` URLs. The QR image is now converted to a file in code
@@ -19,6 +20,7 @@
 - Form title and share text now use the translated QR type name
 - Update/online/offline toasts in `pwa.js` are translated
 - Batch QR type dropdown is translated
+- Error Correction and Size dropdown labels (single and batch form) are translated
 - Saved language choice is now restored on load; `?lang=` links (used by the hreflang tags) now work
 - Changing the language with a form open now re-renders the form and keeps the entered values
 
