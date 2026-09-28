@@ -28,7 +28,7 @@ class QRGeneratorApp {
 
 	// Initial language: ?lang= parameter, then saved choice, then browser language
 	getInitialLanguage() {
-		const supported = ['en', 'es', 'pt', 'fr'];
+		const supported = ['en', 'es', 'pt', 'fr', 'de'];
 
 		try {
 			const fromUrl = new URLSearchParams(window.location.search).get('lang');

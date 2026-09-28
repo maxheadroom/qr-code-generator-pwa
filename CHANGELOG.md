@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- German translation (`de`), selectable in the language menu and through `?lang=de`
+
 ### Fixed
 - Form labels, placeholders, dropdown options and validation messages were always Spanish, even in the English view (visible in the WiFi form). They now use translation keys in all four languages (en, es, pt, fr), with English fallbacks in `qr-types.js`
 - Form title and share text now use the translated QR type name
